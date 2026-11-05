@@ -1,0 +1,444 @@
+{
+  "metadata": {
+    "data_type": "Uploaded ticket transaction aggregates; source transport mode/operator unverified",
+    "source_organization": "Unknown",
+    "source_files": [
+      "Operational_Metro.cpg",
+      "Operational_Metro.dbf",
+      "Operational_Metro.prj",
+      "Ticket-Data-2026-03-04.csv.bz2",
+      "Ticket-Data-2026-03-05.csv.bz2",
+      "Ticket-Data-2026-03-06.csv.bz2",
+      "Ticket-Data-2026-03-07.csv.bz2",
+      "Ticket-Data-2026-03-08.csv.bz2",
+      "Ticket-Data-2026-03-09.csv.bz2",
+      "Ticket-Data-2026-03-10.csv.bz2",
+      "Ticket-Data-2026-03-11.csv.bz2",
+      "Ticket-Data-2026-03-12.csv.bz2",
+      "Ticket-Data-2026-03-13.csv.bz2",
+      "Ticket-Data-2026-03-14.csv.bz2",
+      "Ticket-Data-2026-03-15.csv.bz2",
+      "Ticket-Data-2026-03-16.csv.bz2",
+      "Ticket-Data-2026-03-17.csv.bz2",
+      "Ticket-Data-2026-03-18.csv.bz2",
+      "Ticket-Data-2026-03-19.csv.bz2",
+      "Ticket-Data-2026-03-20.csv.bz2",
+      "Ticket-Data-2026-03-21.csv.bz2",
+      "Ticket-Data-2026-03-22.csv.bz2",
+      "Ticket-Data-2026-03-23.csv.bz2",
+      "Ticket-Data-2026-03-24.csv.bz2",
+      "Ticket-Data-2026-03-25.csv.bz2",
+      "Ticket-Data-2026-03-26.csv.bz2",
+      "Ticket-Data-2026-03-27.csv.bz2",
+      "Ticket-Data-2026-03-28.csv.bz2",
+      "Ticket-Data-2026-03-29.csv.bz2",
+      "Ticket-Data-2026-03-30.csv.bz2",
+      "Ticket-Data-2026-03-31.csv.bz2"
+    ],
+    "reporting_start": "1970-01-01",
+    "reporting_end": "2026-04-01",
+    "processed_at": "2026-11-05T23:45:26+05:30",
+    "confidence": "Medium for aggregate arithmetic; low for mode attribution and representativeness",
+    "validation_status": "Aggregated; not validated as MTC or Water Metro demand",
+    "privacy": "No ticket, employee, payment, device, route, or stop-level identifiers or records are included. Per-archive keyed hashes are used in memory solely to count within-file duplicate ticket IDs; cross-file ID duplicates are not checked. Hourly buckets below the minimum count are suppressed.",
+    "minimum_hourly_bucket_records": 20
+  },
+  "totals": {
+    "source_files_processed": 31,
+    "duplicate_archives_skipped": 0,
+    "ticket_records": 67943937,
+    "passenger_count": 77382796,
+    "gross_ticket_amount": 578225762.0,
+    "duplicate_ticket_ids": 0,
+    "unique_ticket_ids_checked": 67943937
+  },
+  "daily": [
+    {
+      "date": "1970-01-01",
+      "ticket_records": 4,
+      "passenger_count": 4,
+      "gross_ticket_amount": 63.0
+    },
+    {
+      "date": "2026-03-01",
+      "ticket_records": 1715673,
+      "passenger_count": 2084590,
+      "gross_ticket_amount": 18117176.0
+    },
+    {
+      "date": "2026-03-02",
+      "ticket_records": 2387812,
+      "passenger_count": 2673000,
+      "gross_ticket_amount": 19594671.0
+    },
+    {
+      "date": "2026-03-03",
+      "ticket_records": 2274321,
+      "passenger_count": 2548117,
+      "gross_ticket_amount": 18398893.0
+    },
+    {
+      "date": "2026-03-04",
+      "ticket_records": 2281416,
+      "passenger_count": 2557780,
+      "gross_ticket_amount": 18470470.0
+    },
+    {
+      "date": "2026-03-05",
+      "ticket_records": 2279130,
+      "passenger_count": 2559698,
+      "gross_ticket_amount": 18948629.0
+    },
+    {
+      "date": "2026-03-06",
+      "ticket_records": 2281738,
+      "passenger_count": 2559490,
+      "gross_ticket_amount": 18780515.0
+    },
+    {
+      "date": "2026-03-07",
+      "ticket_records": 2193763,
+      "passenger_count": 2522418,
+      "gross_ticket_amount": 19022854.0
+    },
+    {
+      "date": "2026-03-08",
+      "ticket_records": 1754796,
+      "passenger_count": 2148595,
+      "gross_ticket_amount": 19319737.0
+    },
+    {
+      "date": "2026-03-09",
+      "ticket_records": 2407133,
+      "passenger_count": 2687204,
+      "gross_ticket_amount": 19746192.0
+    },
+    {
+      "date": "2026-03-10",
+      "ticket_records": 2365643,
+      "passenger_count": 2655572,
+      "gross_ticket_amount": 19004566.0
+    },
+    {
+      "date": "2026-03-11",
+      "ticket_records": 2317297,
+      "passenger_count": 2580691,
+      "gross_ticket_amount": 18306166.0
+    },
+    {
+      "date": "2026-03-12",
+      "ticket_records": 2316336,
+      "passenger_count": 2581491,
+      "gross_ticket_amount": 18225406.0
+    },
+    {
+      "date": "2026-03-13",
+      "ticket_records": 2318211,
+      "passenger_count": 2605213,
+      "gross_ticket_amount": 18701333.0
+    },
+    {
+      "date": "2026-03-14",
+      "ticket_records": 2156267,
+      "passenger_count": 2492484,
+      "gross_ticket_amount": 18997252.0
+    },
+    {
+      "date": "2026-03-15",
+      "ticket_records": 1757992,
+      "passenger_count": 2147820,
+      "gross_ticket_amount": 18892383.0
+    },
+    {
+      "date": "2026-03-16",
+      "ticket_records": 2434559,
+      "passenger_count": 2716646,
+      "gross_ticket_amount": 19805316.0
+    },
+    {
+      "date": "2026-03-17",
+      "ticket_records": 2321488,
+      "passenger_count": 2600567,
+      "gross_ticket_amount": 18497082.0
+    },
+    {
+      "date": "2026-03-18",
+      "ticket_records": 2315499,
+      "passenger_count": 2588442,
+      "gross_ticket_amount": 18825591.0
+    },
+    {
+      "date": "2026-03-19",
+      "ticket_records": 2050673,
+      "passenger_count": 2324582,
+      "gross_ticket_amount": 16425342.0
+    },
+    {
+      "date": "2026-03-20",
+      "ticket_records": 2242845,
+      "passenger_count": 2527484,
+      "gross_ticket_amount": 17626254.0
+    },
+    {
+      "date": "2026-03-21",
+      "ticket_records": 1980857,
+      "passenger_count": 2340226,
+      "gross_ticket_amount": 18169979.0
+    },
+    {
+      "date": "2026-03-22",
+      "ticket_records": 1723340,
+      "passenger_count": 2114687,
+      "gross_ticket_amount": 18729047.0
+    },
+    {
+      "date": "2026-03-23",
+      "ticket_records": 2429631,
+      "passenger_count": 2719403,
+      "gross_ticket_amount": 19963355.0
+    },
+    {
+      "date": "2026-03-24",
+      "ticket_records": 2350781,
+      "passenger_count": 2639385,
+      "gross_ticket_amount": 19130004.0
+    },
+    {
+      "date": "2026-03-25",
+      "ticket_records": 2300540,
+      "passenger_count": 2576815,
+      "gross_ticket_amount": 18636528.0
+    },
+    {
+      "date": "2026-03-26",
+      "ticket_records": 2293012,
+      "passenger_count": 2561736,
+      "gross_ticket_amount": 17873209.0
+    },
+    {
+      "date": "2026-03-27",
+      "ticket_records": 2286582,
+      "passenger_count": 2564112,
+      "gross_ticket_amount": 17952129.0
+    },
+    {
+      "date": "2026-03-28",
+      "ticket_records": 2171106,
+      "passenger_count": 2492778,
+      "gross_ticket_amount": 18447443.0
+    },
+    {
+      "date": "2026-03-29",
+      "ticket_records": 1748757,
+      "passenger_count": 2119483,
+      "gross_ticket_amount": 17780564.0
+    },
+    {
+      "date": "2026-03-30",
+      "ticket_records": 2360461,
+      "passenger_count": 2648773,
+      "gross_ticket_amount": 19172131.0
+    },
+    {
+      "date": "2026-03-31",
+      "ticket_records": 2102391,
+      "passenger_count": 2415382,
+      "gross_ticket_amount": 18185297.0
+    },
+    {
+      "date": "2026-04-01",
+      "ticket_records": 23883,
+      "passenger_count": 28128,
+      "gross_ticket_amount": 480185.0
+    }
+  ],
+  "hourly": [
+    {
+      "hour": 0,
+      "ticket_records": 85078,
+      "passenger_count": 111961,
+      "gross_ticket_amount": 2688381.0,
+      "suppressed": false
+    },
+    {
+      "hour": 1,
+      "ticket_records": 56089,
+      "passenger_count": 73803,
+      "gross_ticket_amount": 1893575.0,
+      "suppressed": false
+    },
+    {
+      "hour": 2,
+      "ticket_records": 58874,
+      "passenger_count": 76342,
+      "gross_ticket_amount": 1984168.0,
+      "suppressed": false
+    },
+    {
+      "hour": 3,
+      "ticket_records": 111190,
+      "passenger_count": 140177,
+      "gross_ticket_amount": 3368441.0,
+      "suppressed": false
+    },
+    {
+      "hour": 4,
+      "ticket_records": 360282,
+      "passenger_count": 429746,
+      "gross_ticket_amount": 6780237.0,
+      "suppressed": false
+    },
+    {
+      "hour": 5,
+      "ticket_records": 1397903,
+      "passenger_count": 1605463,
+      "gross_ticket_amount": 13095335.0,
+      "suppressed": false
+    },
+    {
+      "hour": 6,
+      "ticket_records": 3012709,
+      "passenger_count": 3391677,
+      "gross_ticket_amount": 22828891.0,
+      "suppressed": false
+    },
+    {
+      "hour": 7,
+      "ticket_records": 4455760,
+      "passenger_count": 4955513,
+      "gross_ticket_amount": 33232081.0,
+      "suppressed": false
+    },
+    {
+      "hour": 8,
+      "ticket_records": 5568118,
+      "passenger_count": 6290218,
+      "gross_ticket_amount": 45323487.0,
+      "suppressed": false
+    },
+    {
+      "hour": 9,
+      "ticket_records": 5471615,
+      "passenger_count": 6157421,
+      "gross_ticket_amount": 43433390.0,
+      "suppressed": false
+    },
+    {
+      "hour": 10,
+      "ticket_records": 4506008,
+      "passenger_count": 5081491,
+      "gross_ticket_amount": 34980916.0,
+      "suppressed": false
+    },
+    {
+      "hour": 11,
+      "ticket_records": 4019216,
+      "passenger_count": 4567112,
+      "gross_ticket_amount": 30539486.0,
+      "suppressed": false
+    },
+    {
+      "hour": 12,
+      "ticket_records": 3730097,
+      "passenger_count": 4242599,
+      "gross_ticket_amount": 28120548.0,
+      "suppressed": false
+    },
+    {
+      "hour": 13,
+      "ticket_records": 3424987,
+      "passenger_count": 3901030,
+      "gross_ticket_amount": 28212368.0,
+      "suppressed": false
+    },
+    {
+      "hour": 14,
+      "ticket_records": 3572376,
+      "passenger_count": 4091649,
+      "gross_ticket_amount": 29841207.0,
+      "suppressed": false
+    },
+    {
+      "hour": 15,
+      "ticket_records": 3774077,
+      "passenger_count": 4342228,
+      "gross_ticket_amount": 31158784.0,
+      "suppressed": false
+    },
+    {
+      "hour": 16,
+      "ticket_records": 4174188,
+      "passenger_count": 4777699,
+      "gross_ticket_amount": 34916752.0,
+      "suppressed": false
+    },
+    {
+      "hour": 17,
+      "ticket_records": 4648928,
+      "passenger_count": 5323951,
+      "gross_ticket_amount": 39570806.0,
+      "suppressed": false
+    },
+    {
+      "hour": 18,
+      "ticket_records": 5136945,
+      "passenger_count": 5901420,
+      "gross_ticket_amount": 45470112.0,
+      "suppressed": false
+    },
+    {
+      "hour": 19,
+      "ticket_records": 4261806,
+      "passenger_count": 4842759,
+      "gross_ticket_amount": 37816069.0,
+      "suppressed": false
+    },
+    {
+      "hour": 20,
+      "ticket_records": 3233062,
+      "passenger_count": 3685594,
+      "gross_ticket_amount": 28931302.0,
+      "suppressed": false
+    },
+    {
+      "hour": 21,
+      "ticket_records": 1985920,
+      "passenger_count": 2299576,
+      "gross_ticket_amount": 19659454.0,
+      "suppressed": false
+    },
+    {
+      "hour": 22,
+      "ticket_records": 715667,
+      "passenger_count": 857989,
+      "gross_ticket_amount": 9762171.0,
+      "suppressed": false
+    },
+    {
+      "hour": 23,
+      "ticket_records": 183042,
+      "passenger_count": 235378,
+      "gross_ticket_amount": 4617801.0,
+      "suppressed": false
+    }
+  ],
+  "quality": {
+    "invalid_records": 0,
+    "invalid_record_reasons": {},
+    "missing_required_columns_by_file": {},
+    "failed_files": [],
+    "sensitive_identifier_columns_excluded": [
+      "conductor_no",
+      "device_serial_number",
+      "driver_no",
+      "id",
+      "merchant_id",
+      "pine_labs_transaction_no",
+      "rrn_number",
+      "schedule_no",
+      "terminal_id",
+      "ticket_no",
+      "waybill_no"
+    ]
+  }
+}

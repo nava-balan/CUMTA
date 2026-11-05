@@ -1,0 +1,168 @@
+{
+  "processed_at": "runtime-generated",
+  "coordinate_reference_system": "EPSG:4326",
+  "layers": [
+    {
+      "layer_id": "metro_station_points",
+      "geometry_source": "routes_merged.qix",
+      "attributes_source": "routes_merged.cpg",
+      "crs_source": "routes_merged.prj",
+      "source_organization": "Not identified in supplied files",
+      "reporting_date": null,
+      "crs": "EPSG:4326",
+      "crs_description": "WGS 84",
+      "confidence": "Medium for geometry format/CRS; source authority and date unverified",
+      "interpretation": "Metro station points from generic Phase 1 C1/C2 source labels; operator and date are unverified.",
+      "shape_type": 11,
+      "feature_count": 51,
+      "attribute_record_count": 51,
+      "fields": [
+        "id",
+        "Name",
+        "descriptio",
+        "timestamp",
+        "begin",
+        "end",
+        "altitudeMo",
+        "tessellate",
+        "extrude",
+        "visibility",
+        "drawOrder",
+        "icon"
+      ],
+      "valid_geometry_count": 51,
+      "empty_or_unsupported_geometry_count": 0,
+      "invalid_coordinate_count": 0,
+      "duplicate_geometry_count": 0,
+      "coordinate_bounds": [
+        80.08127920549411,
+        12.981398,
+        80.30892759473751,
+        13.18424869458197
+      ],
+      "status": "processed"
+    },
+    {
+      "layer_id": "metro_corridors",
+      "geometry_source": "Operational_Metro_Stns.qmd",
+      "attributes_source": "Operational_Metro_Stns.cpg",
+      "crs_source": "Operational_Metro_Stns.prj",
+      "source_organization": "Not identified in supplied files",
+      "reporting_date": null,
+      "crs": "EPSG:4326",
+      "crs_description": "WGS 84",
+      "confidence": "Medium for geometry format/CRS; source authority and date unverified",
+      "interpretation": "Metro corridor geometry and attributes are source-provided; approval and reporting date are unverified.",
+      "shape_type": 13,
+      "feature_count": 4,
+      "attribute_record_count": 4,
+      "fields": [
+        "id",
+        "Corridors",
+        "Phasing",
+        "Prop_Mode",
+        "Identifer",
+        "Length"
+      ],
+      "valid_geometry_count": 4,
+      "empty_or_unsupported_geometry_count": 0,
+      "invalid_coordinate_count": 0,
+      "duplicate_geometry_count": 0,
+      "coordinate_bounds": [
+        80.08125092072089,
+        12.980628604193022,
+        80.30861810933239,
+        13.18378579920446
+      ],
+      "status": "processed"
+    },
+    {
+      "layer_id": "bus_routes",
+      "geometry_source": "Rail_Network_Updated.qmd",
+      "attributes_source": "PT Fare Structure.pdf",
+      "crs_source": "Rail_Network_Updated.prj",
+      "source_organization": "Not identified in supplied files",
+      "reporting_date": null,
+      "crs": "EPSG:4326",
+      "crs_description": "WGS 84",
+      "confidence": "Medium for geometry format/CRS; source authority and date unverified",
+      "interpretation": "Route identifiers and end points indicate bus routes; transport agency is not established by the attachments.",
+      "shape_type": 3,
+      "feature_count": 1348,
+      "attribute_record_count": 1348,
+      "fields": [
+        "route_num",
+        "source",
+        "destinat",
+        "route_id",
+        "poly_idx",
+        "Corridor"
+      ],
+      "valid_geometry_count": 1348,
+      "empty_or_unsupported_geometry_count": 0,
+      "invalid_coordinate_count": 0,
+      "duplicate_geometry_count": 13,
+      "coordinate_bounds": [
+        79.78513,
+        12.61474,
+        80.33591,
+        13.49044
+      ],
+      "status": "processed"
+    }
+  ],
+  "unmapped_layer": {
+    "id": "rail_network_unknown_crs",
+    "geometry_file": "Road_Network_Old CMA.qmd",
+    "attributes_file": "Road_Network_Old CMA.cpg",
+    "crs_file": "Road_Network_Old CMA.prj",
+    "mode": "Rail network (source attributes)",
+    "source_organization": "Not identified in supplied files",
+    "reporting_date": null,
+    "validation_status": "Not mapped: CRS absent in source metadata; coordinate values exceed WGS84 degree ranges",
+    "geometry_component_signature": "Shapefile geometry signature was detected despite .qmd extension",
+    "crs": null,
+    "crs_description": "QGIS CRS metadata",
+    "attributes_available": true
+  },
+  "malformed_geometry_files": [
+    {
+      "filename": "Operational_Metro_Stns.shp",
+      "shape_records": null,
+      "empty_geometry_records": 1,
+      "status": "empty/incomplete geometry component"
+    },
+    {
+      "filename": "Rail_Network_Updated.shp",
+      "shape_records": null,
+      "empty_geometry_records": 2,
+      "status": "empty/incomplete geometry component"
+    },
+    {
+      "filename": "Road_Network_Old CMA.shp",
+      "shape_records": null,
+      "empty_geometry_records": 1,
+      "status": "empty/incomplete geometry component"
+    },
+    {
+      "filename": "routes_merged.qmd",
+      "shape_records": null,
+      "empty_geometry_records": 3,
+      "status": "empty/incomplete geometry component"
+    }
+  ],
+  "empty_geometry_records_in_mismatched_components": 7,
+  "source_authority_verified": false,
+  "waterway_geometry_features": 0,
+  "ferry_terminal_features": 0,
+  "transport_station_features": 51,
+  "transport_line_features": 1352,
+  "metro_line_features": 4,
+  "bus_route_features": 1348,
+  "notes": [
+    "Several actual Shapefile and DBF components have misleading extensions; content signatures and record-count matches were used to recover only identifiable layers.",
+    "No waterway, ferry terminal, MRTS station, or MTC bus-stop geometry was supplied.",
+    "The road/rail network candidate has no CRS in its QGIS metadata and was not transformed or mapped.",
+    "Source organizations and reporting dates are not present in the supplied geospatial metadata."
+  ]
+}

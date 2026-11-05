@@ -1,0 +1,19 @@
+{
+  "database": "data\\processed\\transport.sqlite",
+  "database_mode": "local SQLite; no Supabase credentials/configuration detected",
+  "imported_at": "2026-11-05T23:46:01+05:30",
+  "table_counts": {
+    "data_sources": 58,
+    "waterways": 0,
+    "ferry_stations": 0,
+    "transport_stations": 51,
+    "transport_lines": 1352,
+    "ferry_routes": 0,
+    "ticket_daily": 33,
+    "ticket_hourly": 24
+  },
+  "foreign_key_violations": 0,
+  "source_authority_verified": false,
+  "waterway_source_features": 0,
+  "note": "Empty waterway, ferry-station, and ferry-route tables are intentional: no validated uploaded records were available."
+}

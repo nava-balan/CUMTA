@@ -1,0 +1,26 @@
+[
+  {
+    "filename": "PT Fare Structure.pdf",
+    "source": "user-supplied local attachment",
+    "status": "recovered as a route attribute table; not a PDF fare schedule",
+    "metadata": {
+      "records": 1348,
+      "fields": [
+        "route_num",
+        "source",
+        "destinat",
+        "route_id",
+        "poly_idx",
+        "Corridor"
+      ]
+    },
+    "output": "data\\processed\\documents\\recovered_route_attributes.csv"
+  },
+  {
+    "filename": "Readme.txt",
+    "source": "user-supplied local attachment",
+    "status": "extracted as text",
+    "characters": 5,
+    "output": "data\\processed\\documents\\readme.txt"
+  }
+]
