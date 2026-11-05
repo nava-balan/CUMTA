@@ -110,5 +110,7 @@ def main() -> None:
 
     print("\nThank you for using the calculator. Goodbye!")
 
+
+
 if __name__ == "__main__":
     main()
