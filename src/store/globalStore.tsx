@@ -1,7 +1,7 @@
 // Global Store — CHENNAI 360 | One City. Infinite Possibilities.
 // Central state management for WATERLINK, ROADWATCH, and TRANSITPULSE modules
 
-import React, { createContext, useContext, useReducer, useCallback, type ReactNode } from 'react';
+import React, { createContext, useContext, useReducer, useCallback, useEffect, type ReactNode } from 'react';
 import { ferryFleet, type Ferry } from '../data/ferryFleet';
 import { mockHazardReports, type HazardReport, type HazardSeverity, type VerificationStatus } from '../data/hazardData';
 
@@ -79,7 +79,8 @@ type GlobalAction =
   | { type: 'SET_DEDUP_BANNER'; payload: DedupBannerInfo | null }
   | { type: 'ADD_TOAST'; payload: Omit<Toast, 'id'> }
   | { type: 'REMOVE_TOAST'; payload: string }
-  | { type: 'UPDATE_FERRIES'; payload: Ferry[] };
+  | { type: 'UPDATE_FERRIES'; payload: Ferry[] }
+  | { type: 'SYNC_FROM_BACKEND'; payload: Partial<GlobalState> };
 
 let ticketCounter = 1042;
 let hazardCounter = 720;
@@ -281,6 +282,12 @@ function globalReducer(state: GlobalState, action: GlobalAction): GlobalState {
     case 'UPDATE_FERRIES':
       return { ...state, ferries: action.payload };
 
+    case 'SYNC_FROM_BACKEND':
+      return {
+        ...state,
+        ...action.payload,
+      };
+
     default:
       return state;
   }
@@ -314,6 +321,34 @@ const GlobalContext = createContext<GlobalContextValue | null>(null);
 export function GlobalProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(globalReducer, initialState);
 
+  // Sync initial dataset from JSON backend on startup
+  useEffect(() => {
+    fetch('/api/data')
+      .then((res) => {
+        if (!res.ok) throw new Error('Status ' + res.status);
+        return res.json();
+      })
+      .then((data) => {
+        if (data && typeof data === 'object') {
+          dispatch({
+            type: 'SYNC_FROM_BACKEND',
+            payload: {
+              ...(Array.isArray(data.tickets) && { tickets: data.tickets }),
+              ...(Array.isArray(data.hazardReports) && { hazardReports: data.hazardReports }),
+              ...(Array.isArray(data.ferries) && { ferries: data.ferries }),
+              ...(typeof data.civicPoints === 'number' && { civicPoints: data.civicPoints }),
+              ...(typeof data.totalRevenue === 'number' && { totalRevenue: data.totalRevenue }),
+              ...(typeof data.totalPassengers === 'number' && { totalPassengers: data.totalPassengers }),
+              ...(typeof data.daysInOperation === 'number' && { daysInOperation: data.daysInOperation }),
+            },
+          });
+        }
+      })
+      .catch((err) => {
+        console.info('[CUMTA] Using offline/cached JSON state:', err?.message || err);
+      });
+  }, []);
+
   const setAppMode = useCallback((mode: AppMode) => {
     dispatch({ type: 'SET_APP_MODE', payload: mode });
   }, []);
@@ -324,18 +359,42 @@ export function GlobalProvider({ children }: { children: ReactNode }) {
 
   const bookTicket = useCallback((ticket: Omit<BookedTicket, 'id' | 'bookedAt' | 'qrCode' | 'status'>) => {
     dispatch({ type: 'BOOK_TICKET', payload: ticket });
+    // Asynchronously persist ticket to JSON backend
+    fetch('/api/tickets', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(ticket),
+    }).catch(() => {});
   }, []);
 
   const addHazardReport = useCallback((report: Omit<HazardReport, 'id' | 'upvotes' | 'duplicateCount' | 'verificationStatus' | 'rewardPoints'>) => {
     dispatch({ type: 'ADD_HAZARD_REPORT', payload: report });
+    // Asynchronously persist report to JSON backend
+    fetch('/api/hazards', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(report),
+    }).catch(() => {});
   }, []);
 
   const verifyReport = useCallback((reportId: string, status: VerificationStatus) => {
     dispatch({ type: 'VERIFY_REPORT', payload: { reportId, status } });
+    // Asynchronously update status in JSON backend
+    fetch('/api/hazards', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ reportId, action: 'verify', status }),
+    }).catch(() => {});
   }, []);
 
   const escalateSeverity = useCallback((reportId: string, newSeverity: HazardSeverity, incrementDuplicates = true) => {
     dispatch({ type: 'ESCALATE_SEVERITY', payload: { reportId, newSeverity, incrementDuplicates } });
+    // Asynchronously escalate in JSON backend
+    fetch('/api/hazards', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ reportId, action: 'escalate', newSeverity }),
+    }).catch(() => {});
   }, []);
 
   const addCivicPoints = useCallback((points: number) => {
