@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ShieldCheck, Cpu, Clock, CheckCircle2, X } from 'lucide-react';
+import { Cpu, X } from 'lucide-react';
 
 interface AIVerificationModalProps {
   isOpen: boolean;
@@ -55,7 +55,7 @@ export default function AIVerificationModal({
               Tier 1 — Edge Vision AI Verification
             </h3>
             <p className="text-[11px] text-slate-400 font-mono">
-              On-Device Surface Distress Classifier
+              On-Device Surface Distress Classifier {category ? `(${category})` : ''}
             </p>
           </div>
         </div>

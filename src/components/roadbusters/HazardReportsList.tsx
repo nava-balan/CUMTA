@@ -1,12 +1,5 @@
 import { useState } from 'react';
-import { 
-  AlertTriangle, 
-  ThumbsUp, 
-  Clock, 
-  MapPin, 
-  CheckCircle2, 
-  Filter 
-} from 'lucide-react';
+import { ThumbsUp } from 'lucide-react';
 import { useGlobal } from '../../store/globalStore';
 import { HazardReport, HazardSeverity, getHazardCategoryLabel } from '../../data/hazardData';
 

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Building2, CheckCircle2, ShieldCheck, Clock, AlertTriangle } from 'lucide-react';
+import { Building2, CheckCircle2, ShieldCheck } from 'lucide-react';
 import { useGlobal } from '../../store/globalStore';
 import { HazardReport, HazardSeverity, getHazardCategoryLabel } from '../../data/hazardData';
 

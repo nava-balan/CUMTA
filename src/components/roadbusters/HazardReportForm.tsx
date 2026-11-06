@@ -1,21 +1,10 @@
 import { useState, useMemo } from 'react';
 import { 
   Camera, 
-  MapPin, 
   AlertTriangle, 
   Send, 
-  Upload, 
-  Check, 
   X, 
-  Award,
   CircleDot,
-  Droplets,
-  TrafficCone,
-  Car,
-  Ban,
-  Footprints,
-  Signpost,
-  Lightbulb,
   ShieldCheck
 } from 'lucide-react';
 import { useGlobal } from '../../store/globalStore';
@@ -23,8 +12,7 @@ import {
   HAZARD_CATEGORIES, 
   GCC_ZONES, 
   HazardCategory, 
-  HazardSeverity, 
-  HazardReport 
+  HazardSeverity 
 } from '../../data/hazardData';
 
 function getHaversineDistanceMeters(lat1: number, lon1: number, lat2: number, lon2: number): number {
@@ -53,7 +41,6 @@ export default function HazardReportForm({
     state, 
     addHazardReport, 
     escalateSeverity, 
-    addCivicPoints, 
     addToast,
     setDedupBanner
   } = useGlobal();

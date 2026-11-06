@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Award, Train, Bus, Ship, Check, ArrowRight, ShieldCheck, X } from 'lucide-react';
+import { Award, Train, Bus, Ship, X } from 'lucide-react';
 import { useGlobal } from '../../store/globalStore';
 
 export default function RewardWallet() {

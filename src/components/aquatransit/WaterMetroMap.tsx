@@ -1,10 +1,9 @@
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { Fragment, useState, useEffect } from 'react';
 import { MapContainer, TileLayer, Polyline, CircleMarker, Popup, Tooltip, useMap } from 'react-leaflet';
-import L from 'leaflet';
-import { waterMetroRoutes, WaterMetroRoute, WaterMetroStation } from '../../data/waterMetroRoutes';
+import { waterMetroRoutes, WaterMetroStation } from '../../data/waterMetroRoutes';
 import { ferryFleet, Ferry } from '../../data/ferryFleet';
 import { useGlobal } from '../../store/globalStore';
-import { Ship, Zap, Battery, Users, Sun, Navigation } from 'lucide-react';
+import { Ship } from 'lucide-react';
 
 type MapTileMode = 'dark' | 'street' | 'satellite';
 
@@ -213,7 +212,7 @@ export default function WaterMetroMap() {
             const polylineCoords = route.stations.map((s) => s.coords);
 
             return (
-              <div key={`route-layer-${route.id}`}>
+              <Fragment key={`route-layer-${route.id}`}>
                 {/* Route Polyline */}
                 <Polyline
                   positions={polylineCoords}
@@ -226,7 +225,7 @@ export default function WaterMetroMap() {
                 />
 
                 {/* Stations */}
-                {route.stations.map((st, sIdx) => {
+                {route.stations.map((st) => {
                   return (
                     <CircleMarker
                       key={`st-${route.id}-${st.id}`}
@@ -247,10 +246,24 @@ export default function WaterMetroMap() {
                           {st.name} {st.isInterchange ? `(${st.interchangeType})` : ''}
                         </div>
                       </Tooltip>
+                      <Popup>
+                        <div className="text-xs font-mono text-[#F8FAFC]">
+                          <div className="font-bold text-sm text-[#00D4FF] mb-1">{st.name}</div>
+                          <div className="text-slate-300 mb-1">Corridor: {route.name}</div>
+                          {st.isInterchange && (
+                            <div className="text-[#48D6C5] font-semibold text-[11px] mb-1">
+                              Interchange: {st.interchangeType}
+                            </div>
+                          )}
+                          <div className="text-[10px] text-slate-400">
+                            Coords: {st.coords[0].toFixed(4)}, {st.coords[1].toFixed(4)}
+                          </div>
+                        </div>
+                      </Popup>
                     </CircleMarker>
                   );
                 })}
-              </div>
+              </Fragment>
             );
           })}
 

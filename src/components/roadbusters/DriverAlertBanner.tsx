@@ -1,4 +1,4 @@
-import { AlertTriangle, Navigation, ArrowRight, X } from 'lucide-react';
+import { AlertTriangle, Navigation, X } from 'lucide-react';
 import { useGlobal } from '../../store/globalStore';
 
 export default function DriverAlertBanner() {

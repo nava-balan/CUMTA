@@ -1,8 +1,7 @@
-import { useState, useEffect } from 'react';
+import { Fragment, useState, useEffect } from 'react';
 import { MapContainer, TileLayer, CircleMarker, Circle, Polyline, Popup, Tooltip, useMap, useMapEvents } from 'react-leaflet';
 import { useGlobal } from '../../store/globalStore';
-import { HazardReport, HazardSeverity, getHazardCategoryLabel } from '../../data/hazardData';
-import { AlertTriangle, MapPin, Navigation } from 'lucide-react';
+import { HazardSeverity, getHazardCategoryLabel } from '../../data/hazardData';
 
 type MapTileMode = 'dark' | 'street' | 'satellite';
 
@@ -209,7 +208,7 @@ export default function HazardMap({
             const isCriticalOrHigh = report.severity === 'critical' || report.severity === 'high';
 
             return (
-              <div key={report.id}>
+              <Fragment key={report.id}>
                 {/* Danger Radius Circle for Critical / High Hazards */}
                 {isCriticalOrHigh && (
                   <Circle
@@ -250,7 +249,7 @@ export default function HazardMap({
                     </div>
                   </Popup>
                 </CircleMarker>
-              </div>
+              </Fragment>
             );
           })}
         </MapContainer>

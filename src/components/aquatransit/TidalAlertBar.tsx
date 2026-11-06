@@ -1,4 +1,4 @@
-import { Waves, ShieldCheck, AlertCircle, Compass } from 'lucide-react';
+import { Waves } from 'lucide-react';
 import { bridgeClearances } from '../../data/tidalData';
 
 export default function TidalAlertBar() {

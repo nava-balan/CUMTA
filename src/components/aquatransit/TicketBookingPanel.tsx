@@ -1,16 +1,5 @@
 import { useState, useMemo } from 'react';
-import { 
-  Ship, 
-  MapPin, 
-  Users, 
-  Clock, 
-  ArrowRight, 
-  Ticket as TicketIcon, 
-  Award, 
-  Check, 
-  X,
-  CreditCard
-} from 'lucide-react';
+import { Ship, Ticket as TicketIcon, X } from 'lucide-react';
 import { useGlobal } from '../../store/globalStore';
 import { waterMetroRoutes, WaterMetroStation } from '../../data/waterMetroRoutes';
 import QRCode from '../shared/QRCode';

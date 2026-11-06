@@ -1,14 +1,13 @@
-import { Ship, BatteryCharging, Sun, Users, Gauge } from 'lucide-react';
+import { Ship } from 'lucide-react';
 import { useGlobal } from '../../store/globalStore';
 import { ferryFleet, Ferry } from '../../data/ferryFleet';
 
 interface FerryTelemetryPanelProps {
   onSelectFerry?: (ferry: Ferry) => void;
-  selectedFerryId?: string | null;
 }
 
 export default function FerryTelemetryPanel({ onSelectFerry }: FerryTelemetryPanelProps) {
-  const { state, setMapTarget } = useGlobal();
+  const { state } = useGlobal();
   const ferries = state.ferries.length > 0 ? state.ferries : ferryFleet;
 
   return (

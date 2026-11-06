@@ -2,10 +2,8 @@ import { useState } from 'react';
 import HazardReportForm from '../components/roadbusters/HazardReportForm';
 import HazardMap from '../components/roadbusters/HazardMap';
 import DriverAlertBanner from '../components/roadbusters/DriverAlertBanner';
-import { useGlobal } from '../store/globalStore';
 
 export default function RoadBustersView() {
-  const { state } = useGlobal();
   const [coords, setCoords] = useState<[number, number]>([13.0213, 80.2231]); // Saidapet default
 
   return (

@@ -1,4 +1,4 @@
-import { Ticket, Users, Clock, CheckCircle2 } from 'lucide-react';
+import { Ticket, CheckCircle2 } from 'lucide-react';
 import { useGlobal } from '../../store/globalStore';
 
 export default function LiveBookingsTable() {

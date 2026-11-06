@@ -3,7 +3,6 @@ import {
   Users, 
   Calendar, 
   BatteryCharging, 
-  Leaf, 
   Ship, 
   Zap
 } from 'lucide-react';
