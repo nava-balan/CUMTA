@@ -1,0 +1,2084 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CHENNAI 360 — One City. Infinite Possibilities.</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Leaflet CSS & JS 1.9.4 -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  
+  <!-- Fonts: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    /* Strict Typography & Base Styling */
+    body {
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+      background-color: #FAFAF8;
+      color: #1F2937;
+    }
+    .font-mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Google Maps Tile Dark Inversion Mode */
+    .leaflet-tile-pane.tile-filter-dark {
+      filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
+    }
+    .leaflet-tile-pane.tile-filter-none {
+      filter: none !important;
+    }
+
+    /* Solid Leaflet Overrides (Zero Glassmorphism) */
+    .leaflet-container {
+      background: #F5F3F0 !important;
+      font-family: 'Inter', sans-serif;
+      z-index: 1;
+    }
+    .leaflet-control-zoom {
+      border: 1px solid #E5E7EB !important;
+      border-radius: 8px !important;
+      overflow: hidden;
+    }
+    .leaflet-control-zoom a {
+      background: #FFFFFF !important;
+      color: #374151 !important;
+      border-bottom: 1px solid #E5E7EB !important;
+    }
+    .leaflet-control-zoom a:hover {
+      background: #2563EB !important;
+      color: #FFFFFF !important;
+    }
+    .leaflet-popup-content-wrapper {
+      background: #FFFFFF !important;
+      color: #1F2937 !important;
+      border: 1px solid #D1D5DB !important;
+      border-radius: 8px !important;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2) !important;
+      padding: 0 !important;
+    }
+    .leaflet-popup-content {
+      margin: 16px !important;
+      line-height: 1.4 !important;
+    }
+    .leaflet-popup-tip {
+      background: #FFFFFF !important;
+      border: 1px solid #D1D5DB !important;
+    }
+    .leaflet-popup-close-button {
+      color: #6B7280 !important;
+      padding: 8px !important;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #F5F3F0;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #D1D5DB;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #9CA3AF;
+    }
+
+    /* Strict Card Shadow */
+    .shadow-card {
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+  </style>
+</head>
+<body id="app-body" class="bg-[#FAFAF8] text-[#1F2937] min-h-screen flex flex-col antialiased">
+
+  <!-- ========================================================================= -->
+  <!-- TOP NAVIGATION BAR (CHENNAI 360 SHELL)                                    -->
+  <!-- ========================================================================= -->
+  <header id="top-nav" class="sticky top-0 z-50 bg-[#FAFAF8] border-b border-[#E5E7EB] p-4">
+    <div class="max-w-[1920px] mx-auto flex flex-wrap items-center justify-between gap-4">
+      <!-- Brand Architecture -->
+      <div class="flex items-center gap-4">
+        <div class="w-8 h-8 rounded-lg bg-[#2563EB] flex items-center justify-center text-white font-bold text-base">
+          360
+        </div>
+        <div>
+          <div className="flex items-center gap-2">
+            <span class="font-bold text-base tracking-tight text-[#111827]">
+              CHENNAI 360
+            </span>
+            <span class="text-xs px-2 py-0.5 rounded font-mono font-medium bg-[#F5F3F0] text-[#0284C7] border border-[#E5E7EB]">
+              CUMTA
+            </span>
+          </div>
+          <p class="text-xs text-gray-400 font-mono tracking-wide">
+            One City. Infinite Possibilities.
+          </p>
+        </div>
+      </div>
+
+      <!-- 3 Module Switcher Tabs -->
+      <nav class="flex items-center gap-2 p-1 rounded-lg bg-[#F5F3F0] border border-[#E5E7EB]">
+        <button id="nav-btn-waterlink" onclick="switchModule('waterlink')" class="flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-mono font-bold transition-colors bg-transparent text-gray-500 hover:bg-[#FAFAF8]">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 21c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1 .6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/><path d="M19.38 20A11.6 11.6 0 0 0 21 14l-9-4-9 4c0 2.9.94 5.34 2.81 7.76"/><path d="M19 13V7a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v6"/><path d="M12 10v4"/><path d="M12 2v3"/></svg>
+          <span>WATERLINK</span>
+          <span class="hidden md:inline text-[10px] opacity-75">(Water Metro)</span>
+        </button>
+
+        <button id="nav-btn-roadwatch" onclick="switchModule('roadwatch')" class="flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-mono font-bold transition-colors bg-transparent text-gray-500 hover:bg-[#FAFAF8]">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          <span>ROADWATCH</span>
+          <span class="hidden md:inline text-[10px] opacity-75">(Hazard Detector)</span>
+        </button>
+
+        <button id="nav-btn-transitpulse" onclick="switchModule('transitpulse')" class="flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-mono font-bold transition-colors bg-[#2563EB] text-white">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+          <span>TRANSITPULSE</span>
+          <span class="hidden md:inline text-[10px] opacity-75">(Command Center)</span>
+        </button>
+      </nav>
+
+      <!-- Civic Points Wallet Badge & Role Switcher -->
+      <div class="flex items-center gap-4">
+        <div class="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#F5F3F0] border border-[#E5E7EB] text-xs font-mono">
+          <svg class="w-4 h-4 text-[#0284C7]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>
+          <div>
+            <span class="text-gray-400 text-[10px] block leading-tight">Civic Points</span>
+            <span id="header-points-counter" class="font-bold text-[#0284C7] text-sm leading-tight">350 PTS</span>
+          </div>
+        </div>
+
+        <button id="btn-role-toggle" onclick="toggleUserRole()" class="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#F5F3F0] border border-[#E5E7EB] text-xs font-medium text-[#111827] hover:bg-[#F3F4F6] transition-colors">
+          <svg id="role-icon-user" class="w-3.5 h-3.5 text-[#0284C7]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <span id="role-text">Commuter View</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ========================================================================= -->
+  <!-- TOAST NOTIFICATION CONTAINER                                              -->
+  <!-- ========================================================================= -->
+  <div id="toast-container" class="fixed top-20 right-4 z-[9998] flex flex-col gap-2"></div>
+
+  <!-- ========================================================================= -->
+  <!-- VIEW 1: WATERLINK (PHASE 1 — WATER METRO MODULE)                          -->
+  <!-- ========================================================================= -->
+  <section id="view-waterlink" class="hidden flex-1 flex-col h-[calc(100vh-64px)] bg-white overflow-hidden">
+    <!-- Tidal & Bridge Clearance Status Bar -->
+    <div class="bg-[#F0FDFA] border-b border-[#D1D5DB] px-4 py-2 text-[#111827] text-xs font-mono flex flex-wrap items-center justify-between gap-4">
+      <div class="flex items-center gap-2">
+        <svg class="w-3.5 h-3.5 text-[#0F766E]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 6c.6.5 1.2 1 2.5 1C7 7 7 5 9.5 5c2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/><path d="M2 12c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/><path d="M2 18c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/></svg>
+        <span class="font-bold">Bay of Bengal Tidal Level:</span>
+        <span class="px-1.5 py-0.5 rounded bg-white text-[#0F766E] font-bold">+1.14m MSL (Safe)</span>
+        <span class="hidden sm:inline text-gray-500 text-[11px]">Ennore Surge Gates: Open</span>
+      </div>
+      <div class="flex items-center gap-4 flex-wrap text-[11px]">
+        <div><span class="text-gray-500">Napier Bridge:</span> <span class="px-1 rounded bg-white text-[#0F766E] font-bold">3.9m Safe</span></div>
+        <div><span class="text-gray-500">MRTS Adyar Bridge:</span> <span class="px-1 rounded bg-white text-[#0F766E] font-bold">4.8m Safe</span></div>
+        <div><span class="text-gray-500">Ennore Creek Bridge:</span> <span class="px-1 rounded bg-white text-[#0F766E] font-bold">5.5m Safe</span></div>
+      </div>
+    </div>
+
+    <div class="flex flex-1 overflow-hidden relative">
+      <!-- Left Sidebar: Ticket Zone & Journey Planner -->
+      <aside class="w-full md:w-96 lg:w-[420px] shrink-0 border-r border-[#D1D5DB] bg-white text-[#111827] p-4 flex flex-col gap-4 font-sans text-xs overflow-y-auto">
+        <div class="pb-2 border-b border-[#D1D5DB]">
+          <div class="flex items-center gap-2 mb-1">
+            <svg class="w-4 h-4 text-[#0F766E]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/></svg>
+            <h2 class="font-bold text-sm text-[#111827]">Journey Planner & Ticket Zone</h2>
+          </div>
+          <p class="text-[11px] text-gray-500">
+            Select origin and destination along 6 Chennai waterways with multi-modal CMRL sync.
+          </p>
+        </div>
+
+        <!-- Dropdowns -->
+        <div class="p-4 rounded-lg bg-[#F0FDFA] border border-[#D1D5DB] flex flex-col gap-4">
+          <div>
+            <label class="block text-[11px] font-mono text-[#0F766E] mb-1">ORIGIN TERMINAL</label>
+            <select id="waterlink-origin-select" onchange="calculateWaterlinkFare()" class="w-full bg-white border border-[#D1D5DB] rounded-lg p-2 text-xs text-[#111827] focus:outline-none">
+              <!-- Populated by JS -->
+            </select>
+          </div>
+          <div>
+            <label class="block text-[11px] font-mono text-[#0F766E] mb-1">DESTINATION TERMINAL</label>
+            <select id="waterlink-dest-select" onchange="calculateWaterlinkFare()" class="w-full bg-white border border-[#D1D5DB] rounded-lg p-2 text-xs text-[#111827] focus:outline-none">
+              <!-- Populated by JS -->
+            </select>
+          </div>
+        </div>
+
+        <!-- Vessel Class & Passenger Count -->
+        <div class="p-4 rounded-lg bg-[#F0FDFA] border border-[#D1D5DB] flex flex-col gap-4">
+          <div>
+            <label class="block text-[11px] font-mono text-[#0F766E] mb-2">VESSEL PROPULSION CLASS</label>
+            <div class="grid grid-cols-2 gap-2">
+              <button id="class-catamaran-btn" onclick="setWaterlinkClass('Eco-Catamaran')" class="p-2 rounded-lg text-center font-bold border transition-colors bg-[#0D9488] text-white border-[#0D9488]">
+                Eco-Catamaran
+              </button>
+              <button id="class-hydrofoil-btn" onclick="setWaterlinkClass('Business Hydrofoil')" class="p-2 rounded-lg text-center font-medium border transition-colors bg-white text-[#111827] border-[#D1D5DB]">
+                Business Hydrofoil
+              </button>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between">
+            <span class="text-[11px] font-mono text-gray-700">PASSENGER COUNT</span>
+            <div class="flex items-center gap-2">
+              <button onclick="setWaterlinkPax(1)" class="pax-btn w-7 h-7 rounded-lg text-xs font-mono font-bold bg-[#0D9488] text-white">1</button>
+              <button onclick="setWaterlinkPax(2)" class="pax-btn w-7 h-7 rounded-lg text-xs font-mono font-bold bg-white text-gray-500 border border-[#D1D5DB]">2</button>
+              <button onclick="setWaterlinkPax(3)" class="pax-btn w-7 h-7 rounded-lg text-xs font-mono font-bold bg-white text-gray-500 border border-[#D1D5DB]">3</button>
+              <button onclick="setWaterlinkPax(4)" class="pax-btn w-7 h-7 rounded-lg text-xs font-mono font-bold bg-white text-gray-500 border border-[#D1D5DB]">4</button>
+            </div>
+          </div>
+
+          <label class="flex items-center gap-2 pt-2 border-t border-[#D1D5DB] cursor-pointer">
+            <input type="checkbox" id="redeem-points-cb" onchange="calculateWaterlinkFare()" class="w-4 h-4 accent-[#0D9488] rounded">
+            <span class="text-[11px] text-[#111827]">Redeem Civic Points (<span id="avail-points-text">350</span> Available)</span>
+          </label>
+        </div>
+
+        <!-- Comparison & Fare Summary -->
+        <div class="p-4 rounded-lg bg-[#F0FDFA] border border-[#D1D5DB] flex flex-col gap-2 font-mono">
+          <div class="flex justify-between items-center text-gray-500">
+            <span>Water Transit Time:</span>
+            <span id="summary-water-time" class="font-bold text-[#0F766E]">14 Mins</span>
+          </div>
+          <div class="flex justify-between items-center text-gray-500">
+            <span>Road Traffic Time:</span>
+            <span id="summary-road-time" class="text-[#D97706]">42 Mins</span>
+          </div>
+          <div class="flex justify-between items-center text-gray-500 font-bold">
+            <span>Minutes Saved:</span>
+            <span id="summary-mins-saved" class="text-[#0F766E]">28 Mins Saved</span>
+          </div>
+          <div class="flex justify-between items-center text-gray-500">
+            <span>Next Departure:</span>
+            <span id="summary-departure" class="text-[#111827]">14:30 IST</span>
+          </div>
+
+          <div class="pt-2 border-t border-[#D1D5DB] flex justify-between items-center text-gray-700">
+            <span>Base Fare:</span>
+            <span id="summary-base-fare">₹45</span>
+          </div>
+          <div id="discount-row" class="hidden flex justify-between items-center text-[#0F766E]">
+            <span>Civic Points Discount:</span>
+            <span id="summary-discount">- ₹0</span>
+          </div>
+          <div class="flex justify-between items-center font-bold text-sm text-[#111827] pt-1">
+            <span>Final Ticket Price:</span>
+            <span id="summary-final-price" class="text-base text-[#0F766E]">₹45</span>
+          </div>
+        </div>
+
+        <!-- Single Primary CTA Button (Strict Solid Style) -->
+        <button onclick="bookWaterlinkTicket()" class="w-full py-4 px-4 rounded-lg bg-[#0D9488] text-white font-bold text-sm hover:opacity-90 transition-opacity shadow-card flex items-center justify-center gap-2">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 21c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1 .6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/><path d="M19.38 20A11.6 11.6 0 0 0 21 14l-9-4-9 4c0 2.9.94 5.34 2.81 7.76"/><path d="M19 13V7a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v6"/></svg>
+          <span>Book WaterLink Ticket</span>
+        </button>
+      </aside>
+
+      <!-- Center & Right: Waterway Google Map with 3-Mode Switcher and Telemetry Strip -->
+      <div class="flex-1 flex flex-col relative overflow-hidden">
+        <!-- 3-Mode Map Layer Switcher (Top-Right Corner - Text-Only Pill Buttons, No Emojis) -->
+        <div class="absolute top-4 right-4 z-[400] flex items-center p-1 gap-1 rounded-lg bg-[#F0FDFA] border border-[#D1D5DB] shadow-card font-mono text-xs">
+          <button id="wl-layer-dark" onclick="setWaterlinkTileLayer('dark')" class="px-2 py-1 rounded font-semibold bg-[#0D9488] text-white">Dark Map</button>
+          <button id="wl-layer-street" onclick="setWaterlinkTileLayer('street')" class="px-2 py-1 rounded font-semibold bg-transparent text-[#111827] hover:bg-white">Street Map</button>
+          <button id="wl-layer-satellite" onclick="setWaterlinkTileLayer('satellite')" class="px-2 py-1 rounded font-semibold bg-transparent text-[#111827] hover:bg-white">Satellite</button>
+        </div>
+
+        <!-- Legend Toggles (Top-Left) -->
+        <div class="absolute top-4 left-4 z-[400] p-2 rounded-lg bg-[#F0FDFA] border border-[#D1D5DB] shadow-card text-[11px] font-mono text-[#111827] max-w-xs">
+          <div class="font-bold text-xs mb-2 pb-1 border-b border-[#D1D5DB] flex items-center justify-between">
+            <span>Water Metro Network (6 Routes)</span>
+            <span class="text-[10px] text-[#0F766E]">Google Maps</span>
+          </div>
+          <div class="grid grid-cols-2 gap-1" id="route-legend-container"></div>
+        </div>
+
+        <!-- Leaflet Map Container -->
+        <div id="waterlink-map" class="flex-1 w-full min-h-[460px] relative z-0"></div>
+
+        <!-- Bottom Telemetry Strip (Solid #075B66 cards, p-4, rounded-lg) -->
+        <div class="p-4 bg-white border-t border-[#D1D5DB]">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-bold font-mono text-[#111827] flex items-center gap-1.5">
+              <svg class="w-3.5 h-3.5 text-[#0F766E]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 21c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1 .6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/></svg>
+              <span>Active Battery-Electric Fleet Telemetry (12 Vessels Live — 100ms Interpolation)</span>
+            </span>
+            <span class="text-[10px] font-mono text-[#0F766E]">Click any card to pan camera</span>
+          </div>
+
+          <div id="ferry-cards-container" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 overflow-x-auto pb-1">
+            <!-- Dynamically populated 6/12 ferry cards -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================================= -->
+  <!-- VIEW 2: ROADWATCH (PHASE 2 — HAZARD DETECTOR MODULE)                      -->
+  <!-- ========================================================================= -->
+  <section id="view-roadwatch" class="hidden flex-1 flex-col h-[calc(100vh-64px)] bg-white overflow-hidden">
+    <!-- Public Transport Driver Broadcast Bar (Solid #FF6B00) -->
+    <div id="driver-broadcast-bar" class="hidden bg-[#EA580C] text-white px-4 py-2 border-b border-[#171717] font-mono text-xs flex flex-wrap items-center justify-between gap-4">
+      <div class="flex items-center gap-2 font-bold">
+        <svg class="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <span class="bg-white text-[#111827] px-2 py-0.5 rounded text-[10px] uppercase font-bold tracking-wider">
+          MTC Driver Broadcast
+        </span>
+        <span class="text-[11px] font-semibold">
+          CRITICAL HAZARD ACTIVE: Usman Road / Saidapet Corridor. Recommended Bus Detour active on Google Map.
+        </span>
+      </div>
+      <div class="flex items-center gap-4 text-[11px]">
+        <div class="flex items-center gap-1 font-bold text-white bg-[#FFF8ED] px-2 py-0.5 rounded">
+          <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+          <span>Suggested Bus Detour (Green Dashed Route)</span>
+        </div>
+        <button onclick="dismissDriverAlert()" class="text-white hover:opacity-75 font-bold">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="flex flex-1 overflow-hidden relative">
+      <!-- Left Sidebar: 10-Category Civic Hazard Reporting Studio -->
+      <aside class="w-full md:w-96 lg:w-[420px] shrink-0 border-r border-[#E5E7EB] bg-white text-[#111827] p-4 flex flex-col gap-4 font-sans text-xs overflow-y-auto">
+        <div class="pb-2 border-b border-[#E5E7EB]">
+          <div class="flex items-center gap-2 mb-1">
+            <svg class="w-4 h-4 text-[#EA580C]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            <h2 class="font-bold text-sm text-[#111827]">Civic Hazard Reporting Studio</h2>
+          </div>
+          <p class="text-[11px] text-gray-500">
+            10-category road hazard detector with 50-meter spatial de-duplication and GCC municipal routing.
+          </p>
+        </div>
+
+        <!-- Demo Presets -->
+        <div class="p-2 rounded-lg bg-[#FFF7ED] border border-[#E5E7EB] flex items-center justify-between gap-2">
+          <span class="text-[10px] font-mono text-[#D97706] uppercase font-bold shrink-0">Demo Presets:</span>
+          <div class="flex gap-1 overflow-x-auto">
+            <button onclick="applyRoadwatchPreset('saidapet-duplicate')" class="px-2 py-1 rounded bg-white hover:bg-[#F3F4F6] text-[10px] font-mono text-[#111827] shrink-0 border border-[#E5E7EB]">
+              Saidapet 50m Duplicate
+            </button>
+            <button onclick="applyRoadwatchPreset('tnagar-detour')" class="px-2 py-1 rounded bg-white hover:bg-[#F3F4F6] text-[10px] font-mono text-[#111827] shrink-0 border border-[#E5E7EB]">
+              T. Nagar Detour
+            </button>
+            <button onclick="applyRoadwatchPreset('adyar-footpath')" class="px-2 py-1 rounded bg-white hover:bg-[#F3F4F6] text-[10px] font-mono text-[#111827] shrink-0 border border-[#E5E7EB]">
+              Adyar Footpath
+            </button>
+          </div>
+        </div>
+
+        <!-- 50m De-duplication Banner (Dynamic) -->
+        <div id="rw-dedup-banner" class="hidden p-4 rounded-lg bg-[#FFF7ED] border-2 border-[#D97706] text-[#111827] shadow-card">
+          <div class="flex items-start justify-between gap-2 mb-2">
+            <div class="flex items-center gap-2 text-[#D97706] font-bold text-xs uppercase font-mono">
+              <svg class="w-4 h-4 text-[#D97706]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+              <span>Spatial De-Duplication Active (Within 50m)</span>
+            </div>
+            <button onclick="dismissDedupBanner()" class="text-gray-400 hover:text-gray-900">
+              <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+          </div>
+          <p class="text-[11px] leading-normal font-medium mb-2">
+            Issue already reported in this sector. Report forwarded to Admin and severity escalated for priority municipal action.
+          </p>
+          <div class="flex items-center justify-between text-[10px] font-mono pt-2 border-t border-[#E5E7EB]">
+            <span class="text-[#D97706]">Report Forwarded to Admin</span>
+            <span class="px-2 py-0.5 rounded bg-[#EA580C] text-white font-bold uppercase">
+              Severity: Critical (+15 Pts)
+            </span>
+          </div>
+        </div>
+
+        <form id="roadwatch-form" onsubmit="submitHazardReport(event)" class="flex flex-col gap-4">
+          <!-- 10 Categories Selector -->
+          <div class="p-4 rounded-lg bg-[#FFF7ED] border border-[#E5E7EB] flex flex-col gap-2">
+            <label class="text-[11px] font-mono text-[#D97706] uppercase font-bold">
+              1. Select Hazard Category (10 Supported)
+            </label>
+            <div class="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto pr-1" id="categories-grid-container">
+              <!-- Dynamically populated 10 categories -->
+            </div>
+          </div>
+
+          <!-- Severity Selector -->
+          <div class="p-4 rounded-lg bg-[#FFF7ED] border border-[#E5E7EB] flex flex-col gap-2">
+            <label class="text-[11px] font-mono text-[#D97706] uppercase font-bold">2. Severity Level</label>
+            <div class="grid grid-cols-4 gap-2">
+              <button type="button" onclick="setHazardSeverity('low')" id="sev-btn-low" class="py-2 px-1 rounded text-center text-xs font-mono font-bold uppercase border bg-white text-gray-500 border-[#E5E7EB]">Low</button>
+              <button type="button" onclick="setHazardSeverity('medium')" id="sev-btn-medium" class="py-2 px-1 rounded text-center text-xs font-mono font-bold uppercase border bg-white text-gray-500 border-[#E5E7EB]">Medium</button>
+              <button type="button" onclick="setHazardSeverity('high')" id="sev-btn-high" class="py-2 px-1 rounded text-center text-xs font-mono font-bold uppercase border bg-[#EA580C] text-white border-[#EA580C]">High</button>
+              <button type="button" onclick="setHazardSeverity('critical')" id="sev-btn-critical" class="py-2 px-1 rounded text-center text-xs font-mono font-bold uppercase border bg-white text-gray-500 border-[#E5E7EB]">Critical</button>
+            </div>
+          </div>
+
+          <!-- GPS Lock & Auto GCC Zone -->
+          <div class="p-4 rounded-lg bg-[#FFF7ED] border border-[#E5E7EB] flex flex-col gap-2 font-mono">
+            <div class="flex items-center justify-between text-[11px]">
+              <span class="text-[#D97706] font-bold">3. Telemetry & Location</span>
+              <span class="text-[10px] text-gray-400">Click map to move pin</span>
+            </div>
+            <div class="grid grid-cols-2 gap-2 text-xs">
+              <div class="p-2 rounded bg-white border border-[#E5E7EB]">
+                <span class="text-[10px] text-gray-400 block">Latitude</span>
+                <span id="rw-lat-text" class="font-bold text-[#111827]">13.0213° N</span>
+              </div>
+              <div class="p-2 rounded bg-white border border-[#E5E7EB]">
+                <span class="text-[10px] text-gray-400 block">Longitude</span>
+                <span id="rw-lng-text" class="font-bold text-[#111827]">80.2231° E</span>
+              </div>
+            </div>
+            <div class="p-2 rounded bg-white border border-[#E5E7EB] text-[11px]">
+              <span class="text-gray-400 block text-[10px]">Auto GCC Municipal Assignment</span>
+              <span id="rw-zone-text" class="font-bold text-[#EA580C]">Zone 9 - Teynampet</span>
+            </div>
+          </div>
+
+          <!-- Photo Evidence Preset -->
+          <div class="p-4 rounded-lg bg-[#FFF7ED] border border-[#E5E7EB] flex flex-col gap-2">
+            <label class="text-[11px] font-mono text-[#D97706] uppercase font-bold">4. Photo Evidence</label>
+            <div class="flex items-center justify-between p-2 rounded bg-white border border-[#E5E7EB]">
+              <div class="flex items-center gap-2 truncate">
+                <svg class="w-3.5 h-3.5 text-[#EA580C]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
+                <span id="rw-photo-name" class="text-xs truncate font-mono text-gray-700">saidapet_bridge_potholes_evidence.png</span>
+              </div>
+              <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-[#FFF7ED] text-[#D97706]">GeoTagged</span>
+            </div>
+          </div>
+
+          <!-- Description -->
+          <div class="p-4 rounded-lg bg-[#FFF7ED] border border-[#E5E7EB] flex flex-col gap-2">
+            <label class="text-[11px] font-mono text-[#D97706] uppercase font-bold">5. Hazard Description</label>
+            <textarea id="rw-description" rows="2" class="w-full bg-white border border-[#E5E7EB] rounded p-2 text-xs text-[#111827] focus:outline-none focus:border-[#EA580C]">Recurrent pothole on Saidapet bridge approach ramp. Vehicles slowing down violently.</textarea>
+          </div>
+
+          <!-- Primary CTA Button (Strict Solid Style) -->
+          <button type="submit" class="w-full py-4 px-4 rounded-lg bg-[#EA580C] text-white font-bold text-sm hover:opacity-90 transition-opacity shadow-card flex items-center justify-center gap-2">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            <span>Submit Hazard Report</span>
+          </button>
+        </form>
+      </aside>
+
+      <!-- Center & Right: Hazard Map with Google Maps Tiles and Layer Switcher -->
+      <div class="flex-1 flex flex-col relative overflow-hidden">
+        <!-- 3-Mode Map Layer Switcher (Top-Right Corner - Text-Only Buttons) -->
+        <div class="absolute top-4 right-4 z-[400] flex items-center p-1 gap-1 rounded-lg bg-[#FFF7ED] border border-[#E5E7EB] shadow-card font-mono text-xs">
+          <button id="rw-layer-dark" onclick="setRoadwatchTileLayer('dark')" class="px-2 py-1 rounded font-semibold bg-[#EA580C] text-white">Dark Map</button>
+          <button id="rw-layer-street" onclick="setRoadwatchTileLayer('street')" class="px-2 py-1 rounded font-semibold bg-transparent text-[#111827] hover:bg-white">Street Map</button>
+          <button id="rw-layer-satellite" onclick="setRoadwatchTileLayer('satellite')" class="px-2 py-1 rounded font-semibold bg-transparent text-[#111827] hover:bg-white">Satellite</button>
+        </div>
+
+        <div id="roadwatch-map" class="flex-1 w-full min-h-[460px] relative z-0"></div>
+
+        <!-- Bottom Status Bar -->
+        <div class="p-2 bg-white border-t border-[#E5E7EB] text-[11px] font-mono text-gray-500 flex items-center justify-between">
+          <div class="flex items-center gap-4">
+            <span class="text-[#D97706] font-bold">CLICK MAP TO LOCK LOCATION PIN</span>
+            <span id="rw-active-count">Active Incidents: 6</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-[#EF4444]"></span> Critical
+            <span class="w-2.5 h-2.5 rounded-full bg-[#EA580C]"></span> High
+            <span class="w-2.5 h-2.5 rounded-full bg-[#F59E0B]"></span> Medium
+            <span class="w-2.5 h-2.5 rounded-full bg-[#22C55E]"></span> Low
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================================= -->
+  <!-- VIEW 3: TRANSITPULSE (COMMAND CENTER & ADMIN PORTAL)                      -->
+  <!-- ========================================================================= -->
+  <section id="view-transitpulse" class="flex-1 flex flex-col bg-[#FAFAF8] text-[#111827] min-h-[calc(100vh-64px)] p-8 space-y-8 font-sans overflow-y-auto">
+    <!-- Header -->
+    <div class="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-[#E5E7EB]">
+      <div>
+        <div class="flex items-center gap-2 mb-1">
+          <svg class="w-5 h-5 text-[#2563EB]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+          <h1 class="text-xl font-bold tracking-tight text-[#111827]">
+            TRANSITPULSE — Unified Command Center
+          </h1>
+        </div>
+        <p class="text-xs text-gray-400 font-mono">
+          Chennai Urban Mobility Authority (CUMTA) Integrated Telemetry & Operations Console
+        </p>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="w-2.5 h-2.5 rounded-full bg-[#22C55E]"></span>
+        <span class="text-xs font-mono text-[#0284C7]">CUMTA Central Gateway Live</span>
+      </div>
+    </div>
+
+    <!-- Executive Metrics Row: Solid #1C2541 cards (p-4, rounded-lg) -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+      <!-- 1. Total Revenue Generated -->
+      <div class="bg-[#F5F3F0] border border-[#E5E7EB] rounded-lg p-4 shadow-card">
+        <div class="flex items-center justify-between text-gray-400 mb-2">
+          <span class="text-xs font-mono">Total Revenue (₹)</span>
+          <svg class="w-4 h-4 text-[#2563EB]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        </div>
+        <div id="metric-revenue" class="text-2xl font-bold font-mono text-[#111827]">₹2,847,500</div>
+        <div class="text-[10px] text-[#0284C7] font-mono mt-1">Direct WaterLink Revenue</div>
+      </div>
+
+      <!-- 2. Total Passengers Travelled -->
+      <div class="bg-[#F5F3F0] border border-[#E5E7EB] rounded-lg p-4 shadow-card">
+        <div class="flex items-center justify-between text-gray-400 mb-2">
+          <span class="text-xs font-mono">Total Passengers</span>
+          <svg class="w-4 h-4 text-[#0284C7]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
+        <div id="metric-passengers" class="text-2xl font-bold font-mono text-[#111827]">18,420</div>
+        <div class="text-[10px] text-gray-400 font-mono mt-1">Multi-modal transit riders</div>
+      </div>
+
+      <!-- 3. Days in Operation -->
+      <div class="bg-[#F5F3F0] border border-[#E5E7EB] rounded-lg p-4 shadow-card">
+        <div class="flex items-center justify-between text-gray-400 mb-2">
+          <span class="text-xs font-mono">Days in Operation</span>
+          <svg class="w-4 h-4 text-[#2563EB]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        </div>
+        <div class="text-2xl font-bold font-mono text-[#111827]">47 Days</div>
+        <div class="text-[10px] text-[#22C55E] font-mono mt-1">99.8% System Uptime</div>
+      </div>
+
+      <!-- 4. Active Fleet Status -->
+      <div class="bg-[#F5F3F0] border border-[#E5E7EB] rounded-lg p-4 shadow-card">
+        <div class="flex items-center justify-between text-gray-400 mb-2">
+          <span class="text-xs font-mono">Active Fleet Status</span>
+          <svg class="w-4 h-4 text-[#0284C7]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 21c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1 .6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/></svg>
+        </div>
+        <div class="text-2xl font-bold font-mono text-[#0284C7]">12 / 12 Ferries</div>
+        <div class="text-[10px] text-gray-400 font-mono mt-1">100% Electric Propulsion</div>
+      </div>
+
+      <!-- 5. Total Verified Hazards -->
+      <div class="bg-[#F5F3F0] border border-[#E5E7EB] rounded-lg p-4 shadow-card">
+        <div class="flex items-center justify-between text-gray-400 mb-2">
+          <span class="text-xs font-mono">Total Verified Hazards</span>
+          <svg class="w-4 h-4 text-[#22C55E]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        </div>
+        <div id="metric-verified-hazards" class="text-2xl font-bold font-mono text-[#22C55E]">2 Verified</div>
+        <div class="text-[10px] text-gray-400 font-mono mt-1">GCC Field Audited</div>
+      </div>
+    </div>
+
+    <!-- GCC Municipal Queue & Live Ticket Ledger Tabs -->
+    <div class="flex items-center gap-2 border-b border-[#E5E7EB] pb-2 font-mono text-xs">
+      <button id="pulse-tab-queue" onclick="setTransitPulseTab('queue')" class="flex items-center gap-2 px-4 py-2 rounded-lg font-bold bg-[#2563EB] text-[#111827]">
+        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="16" height="20" x="4" y="2" rx="2" ry="2"/><path d="M9 22v-4h6v4"/></svg>
+        <span>GCC Municipal Verification Queue</span>
+      </button>
+
+      <button id="pulse-tab-ledger" onclick="setTransitPulseTab('ledger')" class="flex items-center gap-2 px-4 py-2 rounded-lg font-bold bg-[#F5F3F0] text-gray-400 hover:text-gray-900 border border-[#E5E7EB]">
+        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/></svg>
+        <span>Live Ticket Ledger</span>
+      </button>
+    </div>
+
+    <!-- Table 1: GCC Municipal Verification Queue -->
+    <div id="tp-panel-queue" class="bg-[#F5F3F0] border border-[#E5E7EB] rounded-lg p-4 text-[#111827] shadow-card font-sans">
+      <div class="flex flex-wrap items-center justify-between gap-4 pb-4 mb-4 border-b border-[#E5E7EB]">
+        <div>
+          <h3 class="text-sm font-bold text-[#111827]">GCC Municipal Verification Queue & Enforcement Desk</h3>
+          <p class="text-xs text-gray-400">Audit reported road defects. Clicking Verify On-Spot marks the item verified and credits +100 Civic Points to the commuter.</p>
+        </div>
+        <div class="text-xs font-mono text-gray-400">
+          Showing All Active Hazards
+        </div>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs font-mono">
+          <thead>
+            <tr class="border-b border-[#E5E7EB] text-gray-400 text-[10px] uppercase">
+              <th class="pb-2 font-semibold">Incident Ref</th>
+              <th class="pb-2 font-semibold">Category</th>
+              <th class="pb-2 font-semibold">Severity</th>
+              <th class="pb-2 font-semibold">GCC Zone & Ward</th>
+              <th class="pb-2 font-semibold">AI Conf.</th>
+              <th class="pb-2 font-semibold">SLA</th>
+              <th class="pb-2 font-semibold">Status</th>
+              <th class="pb-2 font-semibold text-right">Municipal Action</th>
+            </tr>
+          </thead>
+          <tbody id="tp-queue-tbody" class="divide-y divide-[#2A375E]">
+            <!-- Dynamically populated rows -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Table 2: Live Ticket Ledger -->
+    <div id="tp-panel-ledger" class="hidden bg-[#F5F3F0] border border-[#E5E7EB] rounded-lg p-4 text-[#111827] shadow-card font-sans">
+      <div class="flex flex-wrap items-center justify-between gap-4 pb-4 mb-4 border-b border-[#E5E7EB]">
+        <div>
+          <h3 class="text-sm font-bold text-[#111827]">WaterLink Real-Time Ticket Ledger & Boarding Stream</h3>
+          <p class="text-xs text-gray-400">Immutable ticketing transactions with civic point discounts and automated CUMTA revenue split.</p>
+        </div>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs font-mono">
+          <thead>
+            <tr class="border-b border-[#E5E7EB] text-gray-400 text-[10px] uppercase">
+              <th class="pb-2 font-semibold">Pass ID</th>
+              <th class="pb-2 font-semibold">Corridor</th>
+              <th class="pb-2 font-semibold">From Terminal</th>
+              <th class="pb-2 font-semibold">To Terminal</th>
+              <th class="pb-2 font-semibold">Class</th>
+              <th class="pb-2 font-semibold">Pax</th>
+              <th class="pb-2 font-semibold">Fare Paid</th>
+              <th class="pb-2 font-semibold">Timestamp</th>
+              <th class="pb-2 font-semibold text-right">Gate Status</th>
+            </tr>
+          </thead>
+          <tbody id="tp-ledger-tbody" class="divide-y divide-[#2A375E]">
+            <!-- Dynamically populated rows -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================================= -->
+  <!-- MODAL: WATERLINK BOARDING PASS (QR CODE)                                  -->
+  <!-- ========================================================================= -->
+  <div id="ticket-modal" class="hidden fixed inset-0 z-[9999] bg-black bg-opacity-70 flex items-center justify-center p-4">
+    <div class="bg-white border border-[#0D9488] rounded-lg p-8 max-w-sm w-full text-[#111827] font-sans shadow-card">
+      <div class="flex items-center justify-between pb-4 mb-4 border-b border-[#D1D5DB]">
+        <div>
+          <span class="text-[10px] font-mono uppercase text-[#0F766E]">Chennai Unified Transit Pass</span>
+          <h3 class="font-bold text-base text-[#111827]">WaterLink Boarding Pass</h3>
+        </div>
+        <button onclick="closeTicketModal()" class="text-gray-400 hover:text-gray-900">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
+      <div class="flex justify-center my-4" id="modal-qr-container">
+        <!-- SVG QR code injected here -->
+      </div>
+
+      <div class="space-y-2 text-xs font-mono mb-4">
+        <div class="flex justify-between border-b border-[#D1D5DB] pb-1">
+          <span class="text-gray-400">Pass ID:</span>
+          <span id="modal-pass-id" class="font-bold text-[#0F766E]">WL-TKT-1042</span>
+        </div>
+        <div class="flex justify-between border-b border-[#D1D5DB] pb-1">
+          <span class="text-gray-400">Route:</span>
+          <span id="modal-pass-route" class="text-right">Adyar River Corridor</span>
+        </div>
+        <div class="flex justify-between border-b border-[#D1D5DB] pb-1">
+          <span class="text-gray-400">Boarding:</span>
+          <span id="modal-pass-from" class="text-right">Saidapet</span>
+        </div>
+        <div class="flex justify-between border-b border-[#D1D5DB] pb-1">
+          <span class="text-gray-400">Destination:</span>
+          <span id="modal-pass-to" class="text-right">Srinivasapuram / Boat Club</span>
+        </div>
+        <div class="flex justify-between border-b border-[#D1D5DB] pb-1">
+          <span class="text-gray-400">Vessel Class:</span>
+          <span id="modal-pass-class" class="text-right">Eco-Catamaran</span>
+        </div>
+        <div class="flex justify-between border-b border-[#D1D5DB] pb-1">
+          <span class="text-gray-400">Departure:</span>
+          <span id="modal-pass-time" class="text-right">14:30 IST</span>
+        </div>
+        <div class="flex justify-between pt-1 font-bold text-sm text-[#0F766E]">
+          <span>Fare Paid:</span>
+          <span id="modal-pass-fare">₹45</span>
+        </div>
+      </div>
+
+      <button onclick="closeTicketModal()" class="w-full py-2 rounded-lg bg-[#0D9488] text-white font-bold text-xs hover:opacity-90">
+        Close Boarding Pass
+      </button>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- JUDGE DEMO TOOLKIT (CLEAN SOLID PILL BUTTON IN BOTTOM-RIGHT)              -->
+  <!-- ========================================================================= -->
+  <div class="fixed bottom-4 right-4 z-[9999] font-sans">
+    <!-- Expanded Menu Box -->
+    <div id="demo-menu-box" class="hidden bg-[#F5F3F0] border border-[#2563EB] rounded-lg p-4 mb-2 shadow-card w-80 text-xs text-[#111827]">
+      <div class="flex items-center justify-between pb-2 mb-4 border-b border-[#E5E7EB]">
+        <div class="flex items-center gap-2">
+          <svg class="w-4 h-4 text-[#2563EB]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+          <span class="font-bold text-sm">Judge Demo Controls</span>
+        </div>
+        <button onclick="toggleDemoMenu()" class="text-gray-400 hover:text-gray-900">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+      </div>
+
+      <p class="text-[11px] text-gray-500 mb-4 leading-normal">
+        Automated routines for evaluation. Each routine calls map.invalidateSize() after 150ms and executes map.flyTo([lat, lng], 16).
+      </p>
+
+      <div class="space-y-2">
+        <!-- Action 1: Duplicate Pothole (Saidapet) -->
+        <button onclick="runDemoSaidapetDuplicate()" class="w-full text-left p-2 rounded-lg bg-[#FAFAF8] hover:bg-[#F3F4F6] border border-[#E5E7EB] transition-colors">
+          <div class="flex items-center justify-between font-semibold text-[#0284C7] mb-1">
+            <span>1. Test Duplicate Pothole (Saidapet)</span>
+            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+          </div>
+          <p class="text-[10px] text-gray-500">
+            Switches to ROADWATCH, flies to Saidapet [13.0213, 80.2231], triggers 50m duplicate merger, and escalates to Critical.
+          </p>
+        </button>
+
+        <!-- Action 2: MTC Driver Detour (T. Nagar) -->
+        <button onclick="runDemoMTCDriverDetour()" class="w-full text-left p-2 rounded-lg bg-[#FAFAF8] hover:bg-[#F3F4F6] border border-[#E5E7EB] transition-colors">
+          <div class="flex items-center justify-between font-semibold text-[#EA580C] mb-1">
+            <span>2. Test MTC Driver Detour (T. Nagar)</span>
+            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          </div>
+          <p class="text-[10px] text-gray-500">
+            Switches to ROADWATCH, flies to [13.0418, 80.2341], plots danger radius & bus detour route, and activates driver alert bar.
+          </p>
+        </button>
+
+        <!-- Action 3: WaterLink Ticket & Ledger -->
+        <button onclick="runDemoWaterLinkTicket()" class="w-full text-left p-2 rounded-lg bg-[#FAFAF8] hover:bg-[#F3F4F6] border border-[#E5E7EB] transition-colors">
+          <div class="flex items-center justify-between font-semibold text-[#0F766E] mb-1">
+            <span>3. Test WaterLink Ticket & Ledger</span>
+            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/></svg>
+          </div>
+          <p class="text-[10px] text-gray-500">
+            Switches to WATERLINK, books Saidapet to Srinivasapuram ticket, displays QR boarding pass, updates TRANSITPULSE ledger.
+          </p>
+        </button>
+      </div>
+    </div>
+
+    <!-- Solid-Colored Pill Button (Non-negotiable requirement: rounded-full, #3A86FF background, #F8FAFC text, zero emojis) -->
+    <button onclick="toggleDemoMenu()" class="flex items-center gap-2 px-4 py-2 rounded-full bg-[#2563EB] text-[#111827] font-semibold text-xs border border-[#E5E7EB] shadow-card hover:bg-[#1D4ED8] transition-colors">
+      <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+      <span>Judge Demo Controls</span>
+      <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="18 15 12 9 6 15"/></svg>
+    </button>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- APPLICATION ENGINE & SCRIPT                                               -->
+  <!-- ========================================================================= -->
+  <script>
+    // ---------------------------------------------------------------------------
+    // 1. DATA DEFINITIONS & CORRIDORS
+    // ---------------------------------------------------------------------------
+    const WATER_ROUTES = [
+      {
+        id: 1,
+        name: 'Adyar River Corridor',
+        lineLabel: 'Purple Line',
+        color: '#A855F7',
+        stations: [
+          { id: 'R1-S1', name: 'Thiruneermalai', coords: [12.9698, 80.1147], isInterchange: false },
+          { id: 'R1-S2', name: 'Manapakkam', coords: [13.0183, 80.1744], isInterchange: false },
+          { id: 'R1-S3', name: 'Ekkatuthangal', coords: [13.0225, 80.2055], isInterchange: true, interchangeType: 'CMRL Interchange' },
+          { id: 'R1-S4', name: 'Saidapet', coords: [13.0213, 80.2231], isInterchange: true, interchangeType: 'CMRL Interchange' },
+          { id: 'R1-S5', name: 'Kotturpuram', coords: [13.0189, 80.2411], isInterchange: false },
+          { id: 'R1-S6', name: 'Adyar Eco-Park', coords: [13.0136, 80.2588], isInterchange: false },
+          { id: 'R1-S7', name: 'Srinivasapuram / Boat Club', coords: [13.0145, 80.2735], isInterchange: false }
+        ]
+      },
+      {
+        id: 2,
+        name: 'Cooum River Corridor',
+        lineLabel: 'Red Line',
+        color: '#EF4444',
+        stations: [
+          { id: 'R2-S1', name: 'Maduravoyal', coords: [13.0658, 80.1656], isInterchange: false },
+          { id: 'R2-S2', name: 'Koyambedu', coords: [13.0732, 80.1912], isInterchange: true, interchangeType: 'CMRL Interchange' },
+          { id: 'R2-S3', name: 'Anna Nagar East', coords: [13.0850, 80.2185], isInterchange: false },
+          { id: 'R2-S4', name: 'Chetpet Eco-Park', coords: [13.0734, 80.2415], isInterchange: false },
+          { id: 'R2-S5', name: 'Egmore', coords: [13.0782, 80.2618], isInterchange: false },
+          { id: 'R2-S6', name: 'Chintadripet', coords: [13.0744, 80.2711], isInterchange: false },
+          { id: 'R2-S7', name: 'Napier Bridge / Marina', coords: [13.0695, 80.2892], isInterchange: false }
+        ]
+      },
+      {
+        id: 3,
+        name: 'Kovalam Basin & IT Express',
+        lineLabel: 'Pink Line',
+        color: '#EC4899',
+        stations: [
+          { id: 'R3-S1', name: 'Okkiyam Thoraipakkam', coords: [12.9365, 80.2372], isInterchange: false },
+          { id: 'R3-S2', name: 'Sholinganallur', coords: [12.9010, 80.2379], isInterchange: false },
+          { id: 'R3-S3', name: 'Siruseri IT Park Canal Terminal', coords: [12.8350, 80.2295], isInterchange: false },
+          { id: 'R3-S4', name: 'Kelambakkam Creek', coords: [12.7932, 80.2288], isInterchange: false },
+          { id: 'R3-S5', name: 'Kovalam Basin Hub', coords: [12.7895, 80.2512], isInterchange: false }
+        ]
+      },
+      {
+        id: 4,
+        name: 'Buckingham Canal Spine',
+        lineLabel: 'Green Line',
+        color: '#22C55E',
+        stations: [
+          { id: 'R4-S1', name: 'Ennore Creek', coords: [13.2185, 80.3201], isInterchange: false },
+          { id: 'R4-S2', name: 'Tondiarpet', coords: [13.1288, 80.2895], isInterchange: false },
+          { id: 'R4-S3', name: 'Basin Bridge', coords: [13.1022, 80.2735], isInterchange: false },
+          { id: 'R4-S4', name: 'Chennai Central', coords: [13.0827, 80.2755], isInterchange: true, interchangeType: 'Central Hub' },
+          { id: 'R4-S5', name: 'Chepauk', coords: [13.0630, 80.2812], isInterchange: false },
+          { id: 'R4-S6', name: 'Mylapore / Luz', coords: [13.0336, 80.2685], isInterchange: false },
+          { id: 'R4-S7', name: 'Thiruvanmiyur', coords: [12.9865, 80.2605], isInterchange: false },
+          { id: 'R4-S8', name: 'Neelankarai', coords: [12.9492, 80.2555], isInterchange: false }
+        ]
+      },
+      {
+        id: 5,
+        name: 'Kosasthalaiyar River Corridor',
+        lineLabel: 'Burgundy Line',
+        color: '#9F1239',
+        stations: [
+          { id: 'R5-S1', name: 'Poondi Reservoir Hub', coords: [13.1950, 79.8820], isInterchange: false },
+          { id: 'R5-S2', name: 'Thamaraipakkam', coords: [13.1890, 80.0350], isInterchange: false },
+          { id: 'R5-S3', name: 'Vallur', coords: [13.2085, 80.2650], isInterchange: false },
+          { id: 'R5-S4', name: 'Manali New Town', coords: [13.1955, 80.2790], isInterchange: false },
+          { id: 'R5-S5', name: 'Ennore Port Terminal', coords: [13.2280, 80.3280], isInterchange: false }
+        ]
+      },
+      {
+        id: 6,
+        name: 'Coastal Heritage Express',
+        lineLabel: 'Yellow Line',
+        color: '#EAB308',
+        stations: [
+          { id: 'R6-S1', name: 'Marina Lighthouse', coords: [13.0398, 80.2794], isInterchange: false },
+          { id: 'R6-S2', name: 'Besant Nagar', coords: [12.9988, 80.2735], isInterchange: false },
+          { id: 'R6-S3', name: 'Injambakkam', coords: [12.9125, 80.2545], isInterchange: false },
+          { id: 'R6-S4', name: 'Muttukadu Boat House', coords: [12.8055, 80.2442], isInterchange: false },
+          { id: 'R6-S5', name: 'Kovalam Beach', coords: [12.7895, 80.2545], isInterchange: false },
+          { id: 'R6-S6', name: 'Mahabalipuram Terminal', coords: [12.6162, 80.1992], isInterchange: false }
+        ]
+      }
+    ];
+
+    // 12 Live Battery-Electric Ferries (2 per corridor)
+    let FERRY_FLEET = [
+      { id: 'WM-ADY-01', name: 'Kaveri Electric-01', routeId: 1, speed: 14.5, batterySoC: 88, solarChargeRate: 5.4, currentPassengers: 68, maxPassengers: 100, currentStationIndex: 3, progress: 0.45, direction: 1 },
+      { id: 'WM-ADY-02', name: 'Pallava Wave-02', routeId: 1, speed: 16.0, batterySoC: 74, solarChargeRate: 6.1, currentPassengers: 42, maxPassengers: 100, currentStationIndex: 5, progress: 0.72, direction: -1 },
+      { id: 'WM-COU-03', name: 'Sangam Solar-03', routeId: 2, speed: 12.0, batterySoC: 92, solarChargeRate: 4.8, currentPassengers: 84, maxPassengers: 100, currentStationIndex: 1, progress: 0.35, direction: 1 },
+      { id: 'WM-COU-04', name: 'Cheran Hydro-04', routeId: 2, speed: 15.2, batterySoC: 64, solarChargeRate: 5.2, currentPassengers: 51, maxPassengers: 100, currentStationIndex: 4, progress: 0.60, direction: -1 },
+      { id: 'WM-KOV-05', name: 'Pandya Express-05', routeId: 3, speed: 21.0, batterySoC: 81, solarChargeRate: 7.2, currentPassengers: 92, maxPassengers: 100, currentStationIndex: 0, progress: 0.80, direction: 1 },
+      { id: 'WM-KOV-06', name: 'Marina Shuttle-06', routeId: 3, speed: 18.4, batterySoC: 70, solarChargeRate: 6.5, currentPassengers: 63, maxPassengers: 100, currentStationIndex: 3, progress: 0.25, direction: -1 },
+      { id: 'WM-BUC-07', name: 'Coromandel-07', routeId: 4, speed: 11.8, batterySoC: 95, solarChargeRate: 4.2, currentPassengers: 89, maxPassengers: 100, currentStationIndex: 2, progress: 0.50, direction: 1 },
+      { id: 'WM-BUC-08', name: 'Buckingham Runner-08', routeId: 4, speed: 13.5, batterySoC: 58, solarChargeRate: 5.7, currentPassengers: 37, maxPassengers: 100, currentStationIndex: 6, progress: 0.40, direction: -1 },
+      { id: 'WM-KOS-09', name: 'Chola Cruiser-09', routeId: 5, speed: 22.5, batterySoC: 78, solarChargeRate: 7.0, currentPassengers: 45, maxPassengers: 100, currentStationIndex: 1, progress: 0.90, direction: 1 },
+      { id: 'WM-KOS-10', name: 'Pulicat Eco-10', routeId: 5, speed: 14.0, batterySoC: 49, solarChargeRate: 4.0, currentPassengers: 22, maxPassengers: 100, currentStationIndex: 3, progress: 0.15, direction: -1 },
+      { id: 'WM-COA-11', name: 'Shoreline Spirit-11', routeId: 6, speed: 19.0, batterySoC: 86, solarChargeRate: 6.8, currentPassengers: 77, maxPassengers: 100, currentStationIndex: 1, progress: 0.42, direction: 1 },
+      { id: 'WM-COA-12', name: 'Bay Heritage-12', routeId: 6, speed: 17.2, batterySoC: 62, solarChargeRate: 5.5, currentPassengers: 58, maxPassengers: 100, currentStationIndex: 4, progress: 0.70, direction: -1 },
+    ];
+
+    // 10 Supported Civic Hazard Categories
+    const HAZARD_CATEGORIES = [
+      { value: 'potholes', label: 'Potholes' },
+      { value: 'broken-road-surfaces', label: 'Broken Road Surfaces' },
+      { value: 'waterlogging', label: 'Waterlogging' },
+      { value: 'damaged-manholes', label: 'Damaged Manholes' },
+      { value: 'damaged-traffic-signals', label: 'Damaged Traffic Signals' },
+      { value: 'illegal-parking', label: 'Illegal Parking' },
+      { value: 'road-obstruction', label: 'Road Obstruction' },
+      { value: 'damaged-pedestrian-footpaths', label: 'Damaged Pedestrian Footpaths' },
+      { value: 'missing-road-signs', label: 'Missing Road Signs' },
+      { value: 'street-light-failures', label: 'Street Light Failures' }
+    ];
+
+    // GCC Zones
+    const GCC_ZONES = [
+      { id: 1, name: 'Zone 1 - Tiruvottiyur', center: [13.1600, 80.3000] },
+      { id: 2, name: 'Zone 2 - Manali', center: [13.1667, 80.2667] },
+      { id: 3, name: 'Zone 3 - Madhavaram', center: [13.1500, 80.2333] },
+      { id: 4, name: 'Zone 4 - Tondiarpet', center: [13.1250, 80.2850] },
+      { id: 5, name: 'Zone 5 - Royapuram', center: [13.1100, 80.2950] },
+      { id: 6, name: 'Zone 6 - Thiru Vi Ka Nagar', center: [13.1150, 80.2450] },
+      { id: 7, name: 'Zone 7 - Ambattur', center: [13.1143, 80.1548] },
+      { id: 8, name: 'Zone 8 - Anna Nagar', center: [13.0850, 80.2100] },
+      { id: 9, name: 'Zone 9 - Teynampet', center: [13.0400, 80.2500] },
+      { id: 10, name: 'Zone 10 - Kodambakkam', center: [13.0520, 80.2240] },
+      { id: 11, name: 'Zone 11 - Valasaravakkam', center: [13.0500, 80.1700] },
+      { id: 12, name: 'Zone 12 - Alandur', center: [13.0020, 80.2060] },
+      { id: 13, name: 'Zone 13 - Adyar', center: [13.0060, 80.2570] },
+      { id: 14, name: 'Zone 14 - Perungudi', center: [12.9650, 80.2400] },
+      { id: 15, name: 'Zone 15 - Sholinganallur', center: [12.9010, 80.2270] }
+    ];
+
+    // Initial Hazards
+    let HAZARD_REPORTS = [
+      {
+        id: 'HZR-701',
+        category: 'potholes',
+        severity: 'medium',
+        lat: 13.0213,
+        lng: 80.2231,
+        description: 'Recurrent pothole on Saidapet bridge approach ramp. Vehicles swerving sharply into oncoming lane.',
+        gccZone: 'Zone 9 - Teynampet',
+        duplicateCount: 2,
+        aiConfidence: 96,
+        verificationStatus: 'ai-verified',
+        assignedWard: 'Ward 141',
+        estimatedFixHours: 12,
+        rewardPoints: 20
+      },
+      {
+        id: 'HZR-702',
+        category: 'waterlogging',
+        severity: 'critical',
+        lat: 13.0418,
+        lng: 80.2341,
+        description: 'Severe monsoon inundation at Usman Road subway. Water level 2.5ft, traffic stranded. MTC buses requiring diversion.',
+        gccZone: 'Zone 10 - Kodambakkam',
+        duplicateCount: 8,
+        aiConfidence: 98,
+        verificationStatus: 'verified',
+        assignedWard: 'Ward 114',
+        estimatedFixHours: 4,
+        rewardPoints: 50
+      },
+      {
+        id: 'HZR-703',
+        category: 'damaged-manholes',
+        severity: 'critical',
+        lat: 13.0827,
+        lng: 80.2755,
+        description: 'Displaced iron manhole cover near Chennai Central station exit. High hazard for two-wheelers at night.',
+        gccZone: 'Zone 5 - Royapuram',
+        duplicateCount: 14,
+        aiConfidence: 99,
+        verificationStatus: 'pending-municipal',
+        assignedWard: 'Ward 68',
+        estimatedFixHours: 6,
+        rewardPoints: 50
+      },
+      {
+        id: 'HZR-704',
+        category: 'damaged-traffic-signals',
+        severity: 'high',
+        lat: 13.0336,
+        lng: 80.2685,
+        description: 'Traffic signal head broken and flickering at Mylapore Luz Corner. Police manually managing traffic.',
+        gccZone: 'Zone 13 - Adyar',
+        duplicateCount: 3,
+        aiConfidence: 92,
+        verificationStatus: 'pending-municipal',
+        assignedWard: 'Ward 148',
+        estimatedFixHours: 8,
+        rewardPoints: 35
+      },
+      {
+        id: 'HZR-705',
+        category: 'broken-road-surfaces',
+        severity: 'medium',
+        lat: 12.9865,
+        lng: 80.2605,
+        description: 'Asphalt surface sheared off on Thiruvanmiyur ECR link road for 150m. Loose gravel causing slips.',
+        gccZone: 'Zone 14 - Perungudi',
+        duplicateCount: 1,
+        aiConfidence: 89,
+        verificationStatus: 'ai-verified',
+        assignedWard: 'Ward 173',
+        estimatedFixHours: 24,
+        rewardPoints: 20
+      },
+      {
+        id: 'HZR-706',
+        category: 'damaged-pedestrian-footpaths',
+        severity: 'low',
+        lat: 13.0063,
+        lng: 80.2574,
+        description: 'Dislodged granite walkway slabs outside Adyar Depot. Tripping hazard for pedestrians.',
+        gccZone: 'Zone 13 - Adyar',
+        duplicateCount: 0,
+        aiConfidence: 85,
+        verificationStatus: 'pending-ai',
+        assignedWard: 'Ward 171',
+        estimatedFixHours: 48,
+        rewardPoints: 10
+      }
+    ];
+
+    // Initial Tickets
+    let BOOKED_TICKETS = [
+      {
+        id: 'WL-TKT-1038',
+        routeName: 'Adyar River Corridor',
+        fromStation: 'Saidapet',
+        toStation: 'Srinivasapuram / Boat Club',
+        departureTime: '11:15 IST',
+        vesselClass: 'Eco-Catamaran',
+        passengerCount: 1,
+        fare: 45,
+        bookedAt: '10:45 AM',
+        status: 'Confirmed'
+      },
+      {
+        id: 'WL-TKT-1039',
+        routeName: 'Cooum River Corridor',
+        fromStation: 'Koyambedu',
+        toStation: 'Napier Bridge / Marina',
+        departureTime: '12:00 IST',
+        vesselClass: 'Business Hydrofoil',
+        passengerCount: 2,
+        fare: 120,
+        bookedAt: '11:20 AM',
+        status: 'Confirmed'
+      }
+    ];
+
+    // App State
+    let APP_STATE = {
+      activeModule: 'transitpulse', // default view is command center
+      userRole: 'commuter',
+      civicPoints: 350,
+      totalRevenue: 2847500,
+      totalPassengers: 18420,
+      daysInOperation: 47,
+      isDriverAlertActive: false,
+      activeDetourVisible: false,
+      currentHazardCoords: [13.0213, 80.2231],
+      selectedCategory: 'potholes',
+      selectedSeverity: 'high',
+      waterlinkVesselClass: 'Eco-Catamaran',
+      waterlinkPax: 1,
+      ticketCounter: 1042
+    };
+
+    // Global Leaflet Maps & Layer references
+    let wlMap = null;
+    let wlTileLayer = null;
+    let wlFerryMarkers = {};
+    let rwMap = null;
+    let rwTileLayer = null;
+    let rwUserMarker = null;
+    let rwHazardLayerGroup = null;
+    let rwDetourPolyline = null;
+    let rwDangerCircle = null;
+
+    // ---------------------------------------------------------------------------
+    // 2. HAVERSINE DISTANCE HELPER
+    // ---------------------------------------------------------------------------
+    function getDistanceMeters(lat1, lon1, lat2, lon2) {
+      const R = 6371e3;
+      const dLat = (lat2 - lat1) * Math.PI / 180;
+      const dLon = (lon2 - lon1) * Math.PI / 180;
+      const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                Math.sin(dLon/2) * Math.sin(dLon/2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+      return R * c;
+    }
+
+    function getNearestGCCZone(lat, lng) {
+      let closest = GCC_ZONES[8];
+      let minD = Infinity;
+      GCC_ZONES.forEach(z => {
+        const d = getDistanceMeters(lat, lng, z.center[0], z.center[1]);
+        if (d < minD) {
+          minD = d;
+          closest = z;
+        }
+      });
+      return closest.name;
+    }
+
+    // ---------------------------------------------------------------------------
+    // 3. TOAST NOTIFICATION HELPER (ZERO EMOJIS)
+    // ---------------------------------------------------------------------------
+    function showToast(type, title, message) {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      
+      let borderCol = 'border-[#2563EB]';
+      if (type === 'success') borderCol = 'border-[#22C55E]';
+      if (type === 'warning') borderCol = 'border-[#D97706]';
+      if (type === 'error') borderCol = 'border-[#EF4444]';
+
+      toast.className = `flex items-start gap-2 p-4 rounded-lg border ${borderCol} bg-[#F5F3F0] text-[#111827] shadow-card max-w-sm w-full font-sans text-xs transition-opacity duration-300`;
+      toast.innerHTML = `
+        <div class="flex-1">
+          <div class="font-bold text-xs mb-1 text-[#111827]">${title}</div>
+          <div class="text-[11px] text-gray-500 leading-normal">${message}</div>
+        </div>
+        <button onclick="this.parentElement.remove()" class="text-gray-400 hover:text-gray-900 p-1">
+          <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      `;
+
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        setTimeout(() => toast.remove(), 300);
+      }, 4500);
+    }
+
+    // ---------------------------------------------------------------------------
+    // 4. MODULE & THEME SWITCHING (DYNAMIC SOLID COLOR PALETTES)
+    // ---------------------------------------------------------------------------
+    function switchModule(moduleKey) {
+      APP_STATE.activeModule = moduleKey;
+
+      const body = document.getElementById('app-body');
+      const topNav = document.getElementById('top-nav');
+      const vWaterlink = document.getElementById('view-waterlink');
+      const vRoadwatch = document.getElementById('view-roadwatch');
+      const vTransitpulse = document.getElementById('view-transitpulse');
+
+      const btnWl = document.getElementById('nav-btn-waterlink');
+      const btnRw = document.getElementById('nav-btn-roadwatch');
+      const btnTp = document.getElementById('nav-btn-transitpulse');
+
+      // Reset tabs styling
+      [btnWl, btnRw, btnTp].forEach(btn => {
+        btn.className = "flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-mono font-bold transition-colors bg-transparent text-gray-500 hover:bg-[#FAFAF8]";
+      });
+
+      // Hide all views
+      vWaterlink.classList.add('hidden');
+      vRoadwatch.classList.add('hidden');
+      vTransitpulse.classList.add('hidden');
+
+      if (moduleKey === 'waterlink') {
+        body.className = "bg-white text-[#111827] min-h-screen flex flex-col antialiased";
+        topNav.className = "sticky top-0 z-50 bg-white border-b border-[#D1D5DB] p-4";
+        btnWl.className = "flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-mono font-bold transition-colors bg-[#0D9488] text-white";
+        vWaterlink.classList.remove('hidden');
+
+        setTimeout(() => {
+          if (!wlMap) initWaterlinkMap();
+          else wlMap.invalidateSize();
+        }, 150);
+
+      } else if (moduleKey === 'roadwatch') {
+        body.className = "bg-white text-[#111827] min-h-screen flex flex-col antialiased";
+        topNav.className = "sticky top-0 z-50 bg-white border-b border-[#E5E7EB] p-4";
+        btnRw.className = "flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-mono font-bold transition-colors bg-[#EA580C] text-white";
+        vRoadwatch.classList.remove('hidden');
+
+        setTimeout(() => {
+          if (!rwMap) initRoadwatchMap();
+          else rwMap.invalidateSize();
+        }, 150);
+
+      } else {
+        body.className = "bg-[#FAFAF8] text-[#111827] min-h-screen flex flex-col antialiased";
+        topNav.className = "sticky top-0 z-50 bg-[#FAFAF8] border-b border-[#E5E7EB] p-4";
+        btnTp.className = "flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-mono font-bold transition-colors bg-[#2563EB] text-white";
+        vTransitpulse.classList.remove('hidden');
+        renderTransitPulseTables();
+      }
+    }
+
+    function toggleUserRole() {
+      APP_STATE.userRole = APP_STATE.userRole === 'commuter' ? 'admin' : 'commuter';
+      const roleText = document.getElementById('role-text');
+      roleText.textContent = APP_STATE.userRole === 'admin' ? 'Admin View' : 'Commuter View';
+    }
+
+    // ---------------------------------------------------------------------------
+    // 5. WATERLINK LEAFLET MAP & 100ms LIVE VESSEL INTERPOLATION
+    // ---------------------------------------------------------------------------
+    function initWaterlinkMap() {
+      wlMap = L.map('waterlink-map', {
+        center: [13.0418, 80.2341],
+        zoom: 11,
+        attributionControl: false
+      });
+
+      // Default Dark Map using Google Streets with CSS invert filter
+      wlTileLayer = L.tileLayer('https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+        subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+        maxZoom: 20
+      }).addTo(wlMap);
+
+      setWaterlinkTileLayer('dark');
+
+      // Plot 6 Waterway Network Corridors
+      WATER_ROUTES.forEach(route => {
+        const polyCoords = route.stations.map(s => s.coords);
+        L.polyline(polyCoords, {
+          color: route.color,
+          weight: 4,
+          opacity: 0.9,
+          lineJoin: 'round'
+        }).addTo(wlMap);
+
+        route.stations.forEach(st => {
+          L.circleMarker(st.coords, {
+            radius: st.isInterchange ? 6 : 4,
+            color: '#FFFFFF',
+            fillColor: route.color,
+            fillOpacity: 1,
+            weight: st.isInterchange ? 2.5 : 1.5
+          }).bindTooltip(`<b>${st.name}</b> ${st.isInterchange ? '(' + st.interchangeType + ')' : ''}`).addTo(wlMap);
+        });
+      });
+
+      // Create Markers for 12 Live Moving Ferries
+      FERRY_FLEET.forEach(f => {
+        const coords = getFerryCoordinates(f);
+        const marker = L.circleMarker(coords, {
+          radius: 7,
+          color: '#FFFFFF',
+          fillColor: '#00D4FF',
+          fillOpacity: 1,
+          weight: 2
+        }).bindPopup(`
+          <div class="text-xs font-mono text-[#111827]">
+            <div class="font-bold text-sm text-[#0284C7] mb-1">${f.name} (${f.id})</div>
+            <div class="text-gray-500 mb-1">Corridor: Route ${f.routeId}</div>
+            <div class="grid grid-cols-2 gap-1 text-[11px] pt-1 border-t border-[#E5E7EB]">
+              <div>Speed: ${f.speed} kts</div>
+              <div>Battery: ${f.batterySoC}%</div>
+              <div>Solar: ${f.solarChargeRate} kW</div>
+              <div>Pax: ${f.currentPassengers}/${f.maxPassengers}</div>
+            </div>
+          </div>
+        `).addTo(wlMap);
+
+        wlFerryMarkers[f.id] = marker;
+      });
+
+      // Populate Legend
+      const legendContainer = document.getElementById('route-legend-container');
+      legendContainer.innerHTML = '';
+      WATER_ROUTES.forEach(r => {
+        legendContainer.innerHTML += `
+          <div class="flex items-center gap-1.5 p-1 rounded bg-white truncate">
+            <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background-color: ${r.color}"></span>
+            <span class="truncate">${r.name.split(' ')[0]}</span>
+          </div>
+        `;
+      });
+
+      // Populate Telemetry Strip Cards
+      renderFerryTelemetryStrip();
+
+      // Start 100ms Smooth Interpolation Loop
+      setInterval(tickFerryTelemetry, 100);
+    }
+
+    function setWaterlinkTileLayer(mode) {
+      const pane = wlMap.getPane('tilePane');
+      const bDark = document.getElementById('wl-layer-dark');
+      const bStreet = document.getElementById('wl-layer-street');
+      const bSat = document.getElementById('wl-layer-satellite');
+
+      [bDark, bStreet, bSat].forEach(b => {
+        b.className = "px-2 py-1 rounded font-semibold bg-transparent text-[#111827] hover:bg-white";
+      });
+
+      if (mode === 'dark') {
+        bDark.className = "px-2 py-1 rounded font-semibold bg-[#0D9488] text-white";
+        wlTileLayer.setUrl('https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}');
+        pane.className = 'leaflet-pane leaflet-tile-pane tile-filter-dark';
+      } else if (mode === 'street') {
+        bStreet.className = "px-2 py-1 rounded font-semibold bg-[#0D9488] text-white";
+        wlTileLayer.setUrl('https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}');
+        pane.className = 'leaflet-pane leaflet-tile-pane tile-filter-none';
+      } else {
+        bSat.className = "px-2 py-1 rounded font-semibold bg-[#0D9488] text-white";
+        wlTileLayer.setUrl('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}');
+        pane.className = 'leaflet-pane leaflet-tile-pane tile-filter-none';
+      }
+    }
+
+    function getFerryCoordinates(ferry) {
+      const route = WATER_ROUTES.find(r => r.id === ferry.routeId);
+      if (!route || route.stations.length < 2) return [13.0418, 80.2341];
+
+      const idx = Math.min(Math.max(0, ferry.currentStationIndex), route.stations.length - 2);
+      const start = route.stations[idx].coords;
+      const end = route.stations[idx + 1].coords;
+
+      const lat = start[0] + (end[0] - start[0]) * ferry.progress;
+      const lng = start[1] + (end[1] - start[1]) * ferry.progress;
+      return [lat, lng];
+    }
+
+    function tickFerryTelemetry() {
+      FERRY_FLEET.forEach(f => {
+        const route = WATER_ROUTES.find(r => r.id === f.routeId);
+        if (!route) return;
+
+        const delta = (f.speed / 100) * 0.003;
+        f.progress += f.direction * delta;
+
+        if (f.progress >= 1) {
+          f.progress = 0;
+          f.currentStationIndex++;
+          if (f.currentStationIndex >= route.stations.length - 1) {
+            f.currentStationIndex = route.stations.length - 2;
+            f.direction = -1;
+            f.progress = 1;
+          }
+        } else if (f.progress <= 0) {
+          f.progress = 1;
+          f.currentStationIndex--;
+          if (f.currentStationIndex < 0) {
+            f.currentStationIndex = 0;
+            f.direction = 1;
+            f.progress = 0;
+          }
+        }
+
+        const newCoords = getFerryCoordinates(f);
+        if (wlFerryMarkers[f.id]) {
+          wlFerryMarkers[f.id].setLatLng(newCoords);
+        }
+      });
+    }
+
+    function renderFerryTelemetryStrip() {
+      const container = document.getElementById('ferry-cards-container');
+      container.innerHTML = '';
+
+      FERRY_FLEET.slice(0, 6).forEach(f => {
+        const card = document.createElement('button');
+        card.className = "p-4 rounded-lg bg-[#F0FDFA] border border-[#D1D5DB] text-left hover:border-[#48D6C5] transition-colors shadow-card flex flex-col justify-between";
+        card.onclick = () => {
+          const coords = getFerryCoordinates(f);
+          wlMap.flyTo(coords, 15);
+        };
+        card.innerHTML = `
+          <div class="flex items-center justify-between mb-2">
+            <span class="font-bold font-mono text-xs text-[#111827]">${f.id}</span>
+            <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-white text-[#0F766E]">${f.speed} kts</span>
+          </div>
+          <div class="text-[11px] text-gray-700 truncate mb-2">${f.name}</div>
+          <div class="grid grid-cols-3 gap-1 text-[10px] font-mono text-gray-500 pt-2 border-t border-[#D1D5DB]">
+            <div><span class="block text-[9px] text-[#0F766E]">SoC</span><span>${f.batterySoC}%</span></div>
+            <div><span class="block text-[9px] text-[#0F766E]">Solar</span><span>${f.solarChargeRate}k</span></div>
+            <div><span class="block text-[9px] text-[#0F766E]">Pax</span><span>${f.currentPassengers}</span></div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    // ---------------------------------------------------------------------------
+    // 6. TICKET ZONE & JOURNEY PLANNER LOGIC
+    // ---------------------------------------------------------------------------
+    function initWaterlinkSelects() {
+      const originSel = document.getElementById('waterlink-origin-select');
+      const destSel = document.getElementById('waterlink-dest-select');
+
+      originSel.innerHTML = '';
+      destSel.innerHTML = '';
+
+      WATER_ROUTES.forEach(r => {
+        r.stations.forEach(st => {
+          const opt1 = document.createElement('option');
+          opt1.value = `${r.id}::${st.id}::${st.coords[0]}::${st.coords[1]}::${st.name}::${r.name}`;
+          opt1.textContent = `${st.name} (${r.name})`;
+          if (st.name === 'Saidapet') opt1.selected = true;
+          originSel.appendChild(opt1);
+
+          const opt2 = document.createElement('option');
+          opt2.value = `${r.id}::${st.id}::${st.coords[0]}::${st.coords[1]}::${st.name}::${r.name}`;
+          opt2.textContent = `${st.name} (${r.name})`;
+          if (st.name === 'Srinivasapuram / Boat Club') opt2.selected = true;
+          destSel.appendChild(opt2);
+        });
+      });
+
+      calculateWaterlinkFare();
+    }
+
+    function setWaterlinkClass(cls) {
+      APP_STATE.waterlinkVesselClass = cls;
+      const bCat = document.getElementById('class-catamaran-btn');
+      const bHyd = document.getElementById('class-hydrofoil-btn');
+
+      if (cls === 'Eco-Catamaran') {
+        bCat.className = "p-2 rounded-lg text-center font-bold border transition-colors bg-[#0D9488] text-white border-[#0D9488]";
+        bHyd.className = "p-2 rounded-lg text-center font-medium border transition-colors bg-white text-[#111827] border-[#D1D5DB]";
+      } else {
+        bHyd.className = "p-2 rounded-lg text-center font-bold border transition-colors bg-[#0D9488] text-white border-[#0D9488]";
+        bCat.className = "p-2 rounded-lg text-center font-medium border transition-colors bg-white text-[#111827] border-[#D1D5DB]";
+      }
+      calculateWaterlinkFare();
+    }
+
+    function setWaterlinkPax(count) {
+      APP_STATE.waterlinkPax = count;
+      const btns = document.querySelectorAll('.pax-btn');
+      btns.forEach((b, idx) => {
+        if (idx + 1 === count) {
+          b.className = "pax-btn w-7 h-7 rounded-lg text-xs font-mono font-bold bg-[#0D9488] text-white";
+        } else {
+          b.className = "pax-btn w-7 h-7 rounded-lg text-xs font-mono font-bold bg-white text-gray-500 border border-[#D1D5DB]";
+        }
+      });
+      calculateWaterlinkFare();
+    }
+
+    function calculateWaterlinkFare() {
+      const origVal = document.getElementById('waterlink-origin-select').value.split('::');
+      const destVal = document.getElementById('waterlink-dest-select').value.split('::');
+
+      const lat1 = parseFloat(origVal[2]);
+      const lon1 = parseFloat(origVal[3]);
+      const lat2 = parseFloat(destVal[2]);
+      const lon2 = parseFloat(destVal[3]);
+
+      const distKm = Math.max(2.5, getDistanceMeters(lat1, lon1, lat2, lon2) / 1000);
+      const waterMin = Math.max(12, Math.round(distKm * 2.2));
+      const roadMin = Math.max(30, Math.round(distKm * 5.8));
+      const savedMin = Math.max(15, roadMin - waterMin);
+
+      const baseRate = 20 + distKm * 5;
+      const multiplier = APP_STATE.waterlinkVesselClass === 'Business Hydrofoil' ? 1.5 : 1.0;
+      const totalBaseFare = Math.round(baseRate * multiplier * APP_STATE.waterlinkPax);
+
+      const redeemCb = document.getElementById('redeem-points-cb').checked;
+      const maxDiscount = Math.min(APP_STATE.civicPoints, Math.floor(totalBaseFare * 0.3));
+      const discount = redeemCb ? maxDiscount : 0;
+      const finalPrice = Math.max(15, totalBaseFare - discount);
+
+      document.getElementById('summary-water-time').textContent = `${waterMin} Mins`;
+      document.getElementById('summary-road-time').textContent = `${roadMin} Mins`;
+      document.getElementById('summary-mins-saved').textContent = `${savedMin} Mins Saved`;
+      document.getElementById('summary-base-fare').textContent = `₹${totalBaseFare}`;
+
+      const discRow = document.getElementById('discount-row');
+      if (redeemCb && discount > 0) {
+        discRow.classList.remove('hidden');
+        document.getElementById('summary-discount').textContent = `- ₹${discount}`;
+      } else {
+        discRow.classList.add('hidden');
+      }
+
+      document.getElementById('summary-final-price').textContent = `₹${finalPrice}`;
+      document.getElementById('avail-points-text').textContent = APP_STATE.civicPoints;
+    }
+
+    function bookWaterlinkTicket() {
+      const origVal = document.getElementById('waterlink-origin-select').value.split('::');
+      const destVal = document.getElementById('waterlink-dest-select').value.split('::');
+      const fare = parseInt(document.getElementById('summary-final-price').textContent.replace('₹', ''));
+
+      APP_STATE.ticketCounter++;
+      const ticketId = `WL-TKT-${APP_STATE.ticketCounter}`;
+      const nowStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+      const newTicket = {
+        id: ticketId,
+        routeName: origVal[5],
+        fromStation: origVal[4],
+        toStation: destVal[4],
+        departureTime: '14:30 IST',
+        vesselClass: APP_STATE.waterlinkVesselClass,
+        passengerCount: APP_STATE.waterlinkPax,
+        fare: fare,
+        bookedAt: nowStr,
+        status: 'Confirmed'
+      };
+
+      BOOKED_TICKETS.unshift(newTicket);
+      APP_STATE.totalRevenue += fare;
+      APP_STATE.totalPassengers += APP_STATE.waterlinkPax;
+      
+      // Civic points do NOT increase upon booking tickets. If points were redeemed, deduct them:
+      const redeemCb = document.getElementById('redeem-points-cb').checked;
+      if (redeemCb) {
+        const discEl = document.getElementById('summary-discount');
+        const discVal = discEl ? parseInt(discEl.textContent.replace(/[^\d]/g, '')) || 0 : 0;
+        if (discVal > 0) {
+          APP_STATE.civicPoints = Math.max(0, APP_STATE.civicPoints - discVal);
+        }
+      }
+
+      updateMetricCounters();
+      calculateWaterlinkFare();
+
+      // Show Boarding Pass Modal
+      showBoardingPassModal(newTicket);
+
+      showToast('success', 'WaterLink Ticket Issued', `${newTicket.fromStation} to ${newTicket.toStation}. Pass #${ticketId} generated.`);
+    }
+
+    function showBoardingPassModal(ticket) {
+      document.getElementById('modal-pass-id').textContent = ticket.id;
+      document.getElementById('modal-pass-route').textContent = ticket.routeName;
+      document.getElementById('modal-pass-from').textContent = ticket.fromStation;
+      document.getElementById('modal-pass-to').textContent = ticket.toStation;
+      document.getElementById('modal-pass-class').textContent = ticket.vesselClass;
+      document.getElementById('modal-pass-time').textContent = ticket.departureTime;
+      document.getElementById('modal-pass-fare').textContent = `₹${ticket.fare}`;
+
+      // Render vector SVG QR code
+      const qrSvg = generateSVGQRCode(`CHN360::${ticket.id}::VALID`, 140);
+      document.getElementById('modal-qr-container').innerHTML = qrSvg;
+
+      document.getElementById('ticket-modal').classList.remove('hidden');
+    }
+
+    function closeTicketModal() {
+      document.getElementById('ticket-modal').classList.add('hidden');
+    }
+
+    function generateSVGQRCode(str, size) {
+      const gridSize = 21;
+      const cellSize = size / gridSize;
+      let hash = 0;
+      for (let i = 0; i < str.length; i++) {
+        hash = ((hash << 5) - hash) + str.charCodeAt(i);
+        hash |= 0;
+      }
+      hash = Math.abs(hash);
+
+      let rects = '';
+      for (let r = 0; r < gridSize; r++) {
+        for (let c = 0; c < gridSize; c++) {
+          const isTL = r < 7 && c < 7;
+          const isTR = r < 7 && c >= gridSize - 7;
+          const isBL = r >= gridSize - 7 && c < 7;
+          let filled = false;
+          if (isTL || isTR || isBL) {
+            const lr = isTL ? r : isTR ? r : r - (gridSize - 7);
+            const lc = isTL ? c : isTR ? c - (gridSize - 7) : c;
+            filled = (lr === 0 || lr === 6 || lc === 0 || lc === 6) || (lr >= 2 && lr <= 4 && lc >= 2 && lc <= 4);
+          } else {
+            filled = ((hash * (r * gridSize + c + 1) * 7919) % 100) < 45;
+          }
+          if (filled) {
+            rects += `<rect x="${c * cellSize}" y="${r * cellSize}" width="${cellSize}" height="${cellSize}" fill="#042F40"/>`;
+          }
+        }
+      }
+
+      return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" class="rounded border border-[#D1D5DB]"><rect width="${size}" height="${size}" fill="#FFFFFF" rx="4"/>${rects}</svg>`;
+    }
+
+    // ---------------------------------------------------------------------------
+    // 7. ROADWATCH LEAFLET MAP & 10-CATEGORY CIVIC HAZARD REPORTING
+    // ---------------------------------------------------------------------------
+    function initRoadwatchMap() {
+      rwMap = L.map('roadwatch-map', {
+        center: [13.0418, 80.2341],
+        zoom: 12,
+        attributionControl: false
+      });
+
+      rwTileLayer = L.tileLayer('https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+        subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+        maxZoom: 20
+      }).addTo(rwMap);
+
+      setRoadwatchTileLayer('dark');
+
+      rwHazardLayerGroup = L.layerGroup().addTo(rwMap);
+
+      // Selected Location Marker
+      rwUserMarker = L.circleMarker(APP_STATE.currentHazardCoords, {
+        radius: 8,
+        color: '#FFFFFF',
+        fillColor: '#FF6B00',
+        fillOpacity: 1,
+        weight: 2
+      }).addTo(rwMap).bindTooltip('<b>Selected Location Pin</b>', { permanent: true, direction: 'top' });
+
+      // Click to set location
+      rwMap.on('click', e => {
+        APP_STATE.currentHazardCoords = [e.latlng.lat, e.latlng.lng];
+        rwUserMarker.setLatLng(e.latlng);
+        document.getElementById('rw-lat-text').textContent = `${e.latlng.lat.toFixed(4)}° N`;
+        document.getElementById('rw-lng-text').textContent = `${e.latlng.lng.toFixed(4)}° E`;
+        document.getElementById('rw-zone-text').textContent = getNearestGCCZone(e.latlng.lat, e.latlng.lng);
+        updateRoadwatchPhotoFilename(e.latlng.lat, e.latlng.lng, APP_STATE.selectedCategory);
+      });
+
+      // Detour Route (Dashed #48D6C5 polyline)
+      const busDetourCoords = [
+        [13.0470, 80.2280],
+        [13.0440, 80.2310],
+        [13.0380, 80.2360],
+        [13.0310, 80.2340],
+        [13.0250, 80.2280],
+        [13.0210, 80.2210]
+      ];
+
+      rwDetourPolyline = L.polyline(busDetourCoords, {
+        color: '#48D6C5',
+        weight: 4,
+        dashArray: '8, 8',
+        opacity: 0.95
+      });
+
+      // Danger Radius Circle
+      rwDangerCircle = L.circle([13.0418, 80.2341], {
+        radius: 350,
+        color: '#EF4444',
+        fillColor: '#EF4444',
+        fillOpacity: 0.25,
+        weight: 2
+      });
+
+      renderRoadwatchHazards();
+      initRoadwatchCategories();
+    }
+
+    function setRoadwatchTileLayer(mode) {
+      const pane = rwMap.getPane('tilePane');
+      const bDark = document.getElementById('rw-layer-dark');
+      const bStreet = document.getElementById('rw-layer-street');
+      const bSat = document.getElementById('rw-layer-satellite');
+
+      [bDark, bStreet, bSat].forEach(b => {
+        b.className = "px-2 py-1 rounded font-semibold bg-transparent text-[#111827] hover:bg-white";
+      });
+
+      if (mode === 'dark') {
+        bDark.className = "px-2 py-1 rounded font-semibold bg-[#EA580C] text-white";
+        rwTileLayer.setUrl('https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}');
+        pane.className = 'leaflet-pane leaflet-tile-pane tile-filter-dark';
+      } else if (mode === 'street') {
+        bStreet.className = "px-2 py-1 rounded font-semibold bg-[#EA580C] text-white";
+        rwTileLayer.setUrl('https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}');
+        pane.className = 'leaflet-pane leaflet-tile-pane tile-filter-none';
+      } else {
+        bSat.className = "px-2 py-1 rounded font-semibold bg-[#EA580C] text-white";
+        rwTileLayer.setUrl('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}');
+        pane.className = 'leaflet-pane leaflet-tile-pane tile-filter-none';
+      }
+    }
+
+    function initRoadwatchCategories() {
+      const container = document.getElementById('categories-grid-container');
+      container.innerHTML = '';
+
+      HAZARD_CATEGORIES.forEach(cat => {
+        const isSel = APP_STATE.selectedCategory === cat.value;
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = `p-2 rounded text-left text-[11px] transition-colors border truncate ${isSel ? 'bg-[#EA580C] text-white font-bold border-[#EA580C]' : 'bg-white text-gray-500 border-[#E5E7EB]'}`;
+        btn.textContent = cat.label;
+        btn.onclick = () => {
+          APP_STATE.selectedCategory = cat.value;
+          initRoadwatchCategories();
+          updateRoadwatchPhotoFilename(APP_STATE.currentHazardCoords[0], APP_STATE.currentHazardCoords[1], cat.value);
+        };
+        container.appendChild(btn);
+      });
+    }
+
+    function setHazardSeverity(sev) {
+      APP_STATE.selectedSeverity = sev;
+      const sevs = ['low', 'medium', 'high', 'critical'];
+      sevs.forEach(s => {
+        const btn = document.getElementById(`sev-btn-${s}`);
+        if (s === sev) {
+          btn.className = `py-2 px-1 rounded text-center text-xs font-mono font-bold uppercase border bg-[#EA580C] text-white border-[#EA580C]`;
+        } else {
+          btn.className = `py-2 px-1 rounded text-center text-xs font-mono font-bold uppercase border bg-white text-gray-500 border-[#E5E7EB]`;
+        }
+      });
+    }
+
+    function renderRoadwatchHazards() {
+      if (!rwHazardLayerGroup) return;
+      rwHazardLayerGroup.clearLayers();
+
+      HAZARD_REPORTS.forEach(r => {
+        let col = '#22C55E';
+        if (r.severity === 'critical') col = '#EF4444';
+        else if (r.severity === 'high') col = '#FF6B00';
+        else if (r.severity === 'medium') col = '#FFC145';
+
+        const isCrit = r.severity === 'critical' || r.severity === 'high';
+        if (isCrit) {
+          L.circle([r.lat, r.lng], {
+            radius: r.severity === 'critical' ? 250 : 150,
+            color: col,
+            fillColor: col,
+            fillOpacity: 0.2,
+            weight: 1.5
+          }).addTo(rwHazardLayerGroup);
+        }
+
+        L.circleMarker([r.lat, r.lng], {
+          radius: r.severity === 'critical' ? 7 : 5,
+          color: '#FFFFFF',
+          fillColor: col,
+          fillOpacity: 1,
+          weight: 2
+        }).bindPopup(`
+          <div class="text-xs font-mono text-[#111827]">
+            <div class="font-bold text-sm text-[#EA580C] mb-1">#${r.id} — ${r.category}</div>
+            <div class="text-gray-500 mb-1">${r.description}</div>
+            <div class="grid grid-cols-2 gap-1 text-[10px] pt-1 border-t border-[#E5E7EB]">
+              <div>Zone: ${r.gccZone}</div>
+              <div>Severity: <span class="font-bold uppercase" style="color: ${col}">${r.severity}</span></div>
+              <div>Duplicates: ${r.duplicateCount}</div>
+              <div>Status: ${r.verificationStatus}</div>
+            </div>
+          </div>
+        `).addTo(rwHazardLayerGroup);
+      });
+
+      document.getElementById('rw-active-count').textContent = `Active Incidents: ${HAZARD_REPORTS.length}`;
+    }
+
+    function getAppropriateAreaFilename(lat, lng, cat) {
+      const areas = [
+        { name: 'saidapet_bridge', lat: 13.0213, lng: 80.2231 },
+        { name: 'usman_road_tnagar', lat: 13.0418, lng: 80.2341 },
+        { name: 'adyar_depot', lat: 13.0063, lng: 80.2574 },
+        { name: 'anna_nagar_west', lat: 13.0850, lng: 80.2185 },
+        { name: 'koyambedu_junction', lat: 13.0732, lng: 80.1912 },
+        { name: 'central_chintadripet', lat: 13.0782, lng: 80.2660 },
+        { name: 'mylapore_luz', lat: 13.0336, lng: 80.2685 },
+        { name: 'guindy_racecourse', lat: 13.0067, lng: 80.2030 },
+        { name: 'ekkatuthangal', lat: 13.0225, lng: 80.2055 },
+        { name: 'ennore_expressway', lat: 13.2185, lng: 80.3201 },
+        { name: 'sholinganallur_omr', lat: 12.9010, lng: 80.2379 },
+        { name: 'velachery_bypass', lat: 12.9815, lng: 80.2180 }
+      ];
+
+      let closest = areas[0];
+      let minD = Infinity;
+      for (const a of areas) {
+        const d = getDistanceMeters(lat, lng, a.lat, a.lng);
+        if (d < minD) {
+          minD = d;
+          closest = a;
+        }
+      }
+
+      let areaSlug = closest.name;
+      if (minD > 2000) {
+        const zoneStr = getNearestGCCZone(lat, lng);
+        const zonePart = zoneStr.split('-')[1] || zoneStr;
+        areaSlug = zonePart.trim().toLowerCase().replace(/[^a-z0-9]+/g, '_');
+      }
+
+      const catSlug = (cat || 'hazard').toLowerCase().replace(/[^a-z0-9]+/g, '_');
+      return `${areaSlug}_${catSlug}_evidence.png`;
+    }
+
+    function updateRoadwatchPhotoFilename(lat, lng, cat) {
+      const [curLat, curLng] = (lat !== undefined && lng !== undefined) ? [lat, lng] : APP_STATE.currentHazardCoords;
+      const curCat = cat || APP_STATE.selectedCategory;
+      const fn = getAppropriateAreaFilename(curLat, curLng, curCat);
+      const el = document.getElementById('rw-photo-name');
+      if (el) el.textContent = fn;
+      return fn;
+    }
+
+    function applyRoadwatchPreset(preset) {
+      if (preset === 'saidapet-duplicate') {
+        APP_STATE.selectedCategory = 'potholes';
+        setHazardSeverity('medium');
+        APP_STATE.currentHazardCoords = [13.0213, 80.2231];
+        document.getElementById('rw-description').value = 'Recurrent pothole on Saidapet bridge approach ramp. Vehicles slowing down violently.';
+      } else if (preset === 'tnagar-detour') {
+        APP_STATE.selectedCategory = 'waterlogging';
+        setHazardSeverity('critical');
+        APP_STATE.currentHazardCoords = [13.0418, 80.2341];
+        document.getElementById('rw-description').value = 'Severe monsoon inundation at Usman Road subway. Water level 2.5ft.';
+      } else {
+        APP_STATE.selectedCategory = 'damaged-pedestrian-footpaths';
+        setHazardSeverity('low');
+        APP_STATE.currentHazardCoords = [13.0063, 80.2574];
+        document.getElementById('rw-description').value = 'Broken paver blocks outside Adyar depot creating tripping risk.';
+      }
+
+      updateRoadwatchPhotoFilename(APP_STATE.currentHazardCoords[0], APP_STATE.currentHazardCoords[1], APP_STATE.selectedCategory);
+      initRoadwatchCategories();
+      document.getElementById('rw-lat-text').textContent = `${APP_STATE.currentHazardCoords[0].toFixed(4)}° N`;
+      document.getElementById('rw-lng-text').textContent = `${APP_STATE.currentHazardCoords[1].toFixed(4)}° E`;
+      document.getElementById('rw-zone-text').textContent = getNearestGCCZone(APP_STATE.currentHazardCoords[0], APP_STATE.currentHazardCoords[1]);
+
+      if (rwUserMarker) rwUserMarker.setLatLng(APP_STATE.currentHazardCoords);
+      if (rwMap) rwMap.flyTo(APP_STATE.currentHazardCoords, 16);
+    }
+
+    // 50-Meter Spatial De-Duplication & Severity Escalation Submission
+    function submitHazardReport(e) {
+      e.preventDefault();
+
+      const [curLat, curLng] = APP_STATE.currentHazardCoords;
+      const cat = APP_STATE.selectedCategory;
+
+      // 50-Meter Spatial De-Duplication Check
+      const duplicate = HAZARD_REPORTS.find(r => {
+        if (r.category !== cat) return false;
+        const dist = getDistanceMeters(curLat, curLng, r.lat, r.lng);
+        return dist <= 50; // Strict 50-meter threshold
+      });
+
+      if (duplicate) {
+        // Escalate severity: Medium -> High -> Critical
+        if (duplicate.severity === 'low') duplicate.severity = 'medium';
+        else if (duplicate.severity === 'medium') duplicate.severity = 'high';
+        else duplicate.severity = 'critical';
+
+        duplicate.duplicateCount++;
+        // Civic points are NOT awarded on duplicate or raw submission. Strictly upon verification.
+        updateMetricCounters();
+
+        document.getElementById('rw-dedup-banner').classList.remove('hidden');
+        renderRoadwatchHazards();
+
+        showToast('warning', '50-Meter Spatial De-Duplication Triggered', `Issue already reported within 50m! Escalated to ${duplicate.severity.toUpperCase()}. Pending GCC municipal verification for +100 Civic Points.`);
+        return;
+      }
+
+      // No duplicate: New Report
+      const newId = `HZR-${700 + HAZARD_REPORTS.length + 1}`;
+      const photoName = updateRoadwatchPhotoFilename(curLat, curLng, cat);
+      HAZARD_REPORTS.unshift({
+        id: newId,
+        category: cat,
+        severity: APP_STATE.selectedSeverity,
+        lat: curLat,
+        lng: curLng,
+        description: document.getElementById('rw-description').value,
+        gccZone: getNearestGCCZone(curLat, curLng),
+        duplicateCount: 0,
+        aiConfidence: 96.8,
+        verificationStatus: 'pending-ai',
+        assignedWard: 'Ward 124',
+        estimatedFixHours: APP_STATE.selectedSeverity === 'critical' ? 4 : 12,
+        rewardPoints: 25,
+        photoUrl: photoName
+      });
+
+      // Civic points are NOT awarded upon unverified report submission. Points strictly awarded once verified by GCC field officers.
+      updateMetricCounters();
+      renderRoadwatchHazards();
+
+      showToast('success', 'Report Edge-Verified & Routed to GCC', `Hazard #${newId} logged. Pending GCC municipal verification (+100 Civic Points upon audit).`);
+    }
+
+    function dismissDedupBanner() {
+      document.getElementById('rw-dedup-banner').classList.add('hidden');
+    }
+
+    function dismissDriverAlert() {
+      document.getElementById('driver-broadcast-bar').classList.add('hidden');
+      if (rwDetourPolyline && rwMap) rwMap.removeLayer(rwDetourPolyline);
+      if (rwDangerCircle && rwMap) rwMap.removeLayer(rwDangerCircle);
+    }
+
+    // ---------------------------------------------------------------------------
+    // 8. TRANSITPULSE COMMAND CENTER TABLES & MUNICIPAL VERIFY ON-SPOT (+100 PTS)
+    // ---------------------------------------------------------------------------
+    function setTransitPulseTab(tab) {
+      const bQueue = document.getElementById('pulse-tab-queue');
+      const bLedger = document.getElementById('pulse-tab-ledger');
+      const pQueue = document.getElementById('tp-panel-queue');
+      const pLedger = document.getElementById('tp-panel-ledger');
+
+      if (tab === 'queue') {
+        bQueue.className = "flex items-center gap-2 px-4 py-2 rounded-lg font-bold bg-[#2563EB] text-[#111827]";
+        bLedger.className = "flex items-center gap-2 px-4 py-2 rounded-lg font-bold bg-[#F5F3F0] text-gray-400 hover:text-gray-900 border border-[#E5E7EB]";
+        pQueue.classList.remove('hidden');
+        pLedger.classList.add('hidden');
+      } else {
+        bLedger.className = "flex items-center gap-2 px-4 py-2 rounded-lg font-bold bg-[#2563EB] text-[#111827]";
+        bQueue.className = "flex items-center gap-2 px-4 py-2 rounded-lg font-bold bg-[#F5F3F0] text-gray-400 hover:text-gray-900 border border-[#E5E7EB]";
+        pLedger.classList.remove('hidden');
+        pQueue.classList.add('hidden');
+      }
+    }
+
+    function renderTransitPulseTables() {
+      // Municipal Queue
+      const queueTbody = document.getElementById('tp-queue-tbody');
+      queueTbody.innerHTML = '';
+
+      HAZARD_REPORTS.forEach(r => {
+        let col = '#22C55E';
+        if (r.severity === 'critical') col = '#EF4444';
+        else if (r.severity === 'high') col = '#FF6B00';
+        else if (r.severity === 'medium') col = '#FFC145';
+
+        const isVerified = r.verificationStatus === 'verified';
+
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-[#FAFAF8] transition-colors";
+        tr.innerHTML = `
+          <td class="py-2.5 font-bold text-[#0284C7]">${r.id}</td>
+          <td class="py-2.5 text-gray-700">${r.category}</td>
+          <td class="py-2.5"><span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase" style="color: ${col}; background-color: #0B132B">${r.severity}</span></td>
+          <td class="py-2.5 text-gray-500"><div>${r.gccZone.split(' - ')[1] || r.gccZone}</div><div class="text-[10px] text-gray-400">${r.assignedWard}</div></td>
+          <td class="py-2.5 text-[#0284C7]">${r.aiConfidence}%</td>
+          <td class="py-2.5 text-gray-500">${r.estimatedFixHours}h</td>
+          <td class="py-2.5"><span class="text-[10px] uppercase font-bold ${isVerified ? 'text-[#22C55E]' : 'text-[#D97706]'}">${r.verificationStatus}</span></td>
+          <td class="py-2.5 text-right">
+            ${isVerified ? `
+              <span class="inline-flex items-center gap-1 text-[10px] text-[#22C55E] font-bold">
+                <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                <span>Verified (+100 Pts)</span>
+              </span>
+            ` : `
+              <button onclick="verifyHazardOnSpot('${r.id}')" class="px-2 py-1 rounded bg-[#FAFAF8] text-[#0284C7] border border-[#2563EB] hover:bg-[#2563EB] hover:text-[#FFFFFF] text-[10px] font-bold transition-colors inline-flex items-center gap-1">
+                <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+                <span>Verify On-Spot (+100 Pts)</span>
+              </button>
+            `}
+          </td>
+        `;
+        queueTbody.appendChild(tr);
+      });
+
+      // Live Ticket Ledger
+      const ledgerTbody = document.getElementById('tp-ledger-tbody');
+      ledgerTbody.innerHTML = '';
+
+      BOOKED_TICKETS.forEach(t => {
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-[#FAFAF8] transition-colors";
+        tr.innerHTML = `
+          <td class="py-2.5 font-bold text-[#0284C7]">${t.id}</td>
+          <td class="py-2.5 text-gray-700">${t.routeName}</td>
+          <td class="py-2.5 text-gray-500">${t.fromStation}</td>
+          <td class="py-2.5 text-gray-500">${t.toStation}</td>
+          <td class="py-2.5"><span class="px-1.5 py-0.5 rounded bg-[#FAFAF8] text-[10px] text-gray-500 border border-[#E5E7EB]">${t.vesselClass}</span></td>
+          <td class="py-2.5 text-gray-500">${t.passengerCount}</td>
+          <td class="py-2.5 font-bold text-[#22C55E]">₹${t.fare}</td>
+          <td class="py-2.5 text-gray-400 text-[11px]">${t.bookedAt}</td>
+          <td class="py-2.5 text-right">
+            <span class="inline-flex items-center gap-1 text-[10px] text-[#22C55E] font-bold">
+              <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+              <span>Confirmed</span>
+            </span>
+          </td>
+        `;
+        ledgerTbody.appendChild(tr);
+      });
+    }
+
+    function verifyHazardOnSpot(reportId) {
+      const rep = HAZARD_REPORTS.find(r => r.id === reportId);
+      if (rep && rep.verificationStatus !== 'verified') {
+        rep.verificationStatus = 'verified';
+        APP_STATE.civicPoints += 100;
+        updateMetricCounters();
+        renderTransitPulseTables();
+        renderRoadwatchHazards();
+
+        showToast('success', 'Municipal On-Spot Verification Logged', `Report #${reportId} verified by ward field unit. +100 Civic Points credited.`);
+      }
+    }
+
+    function updateMetricCounters() {
+      const ptsCounter = document.getElementById('header-points-counter');
+      if (ptsCounter) ptsCounter.textContent = `${APP_STATE.civicPoints} PTS`;
+      const availPts = document.getElementById('avail-points-text');
+      if (availPts) availPts.textContent = APP_STATE.civicPoints;
+      const revEl = document.getElementById('metric-revenue');
+      if (revEl) revEl.textContent = `₹${APP_STATE.totalRevenue.toLocaleString()}`;
+      const paxEl = document.getElementById('metric-passengers');
+      if (paxEl) paxEl.textContent = APP_STATE.totalPassengers.toLocaleString();
+      
+      const verifiedCount = HAZARD_REPORTS.filter(r => r.verificationStatus === 'verified').length;
+      const verEl = document.getElementById('metric-verified-hazards');
+      if (verEl) verEl.textContent = `${verifiedCount} Verified`;
+    }
+
+    // ---------------------------------------------------------------------------
+    // 9. JUDGE DEMO TOOLKIT (CAMERA FLY-TO & MAP INVALIDATE-SIZE)
+    // ---------------------------------------------------------------------------
+    function toggleDemoMenu() {
+      const menu = document.getElementById('demo-menu-box');
+      menu.classList.toggle('hidden');
+    }
+
+    // Demo 1: Test Duplicate Pothole (Saidapet)
+    function runDemoSaidapetDuplicate() {
+      toggleDemoMenu();
+      switchModule('roadwatch');
+
+      setTimeout(() => {
+        if (rwMap) {
+          rwMap.invalidateSize();
+          rwMap.flyTo([13.0213, 80.2231], 16, { duration: 1.2 });
+        }
+      }, 150);
+
+      // Trigger Saidapet Pothole 50m Duplicate
+      applyRoadwatchPreset('saidapet-duplicate');
+
+      const rep = HAZARD_REPORTS.find(r => r.id === 'HZR-701') || HAZARD_REPORTS[0];
+      rep.severity = 'critical';
+      rep.duplicateCount++;
+      // No points granted on duplicate submission. Strictly awarded upon verification (+100 PTS).
+      updateMetricCounters();
+
+      document.getElementById('rw-dedup-banner').classList.remove('hidden');
+      renderRoadwatchHazards();
+
+      showToast('warning', '50m Spatial De-Duplication Triggered', 'Duplicate Pothole merged at Saidapet [13.0213, 80.2231]. Severity escalated to CRITICAL. Pending municipal verification for +100 Civic Points.');
+    }
+
+    // Demo 2: Test MTC Driver Detour (T. Nagar)
+    function runDemoMTCDriverDetour() {
+      toggleDemoMenu();
+      switchModule('roadwatch');
+
+      setTimeout(() => {
+        if (rwMap) {
+          rwMap.invalidateSize();
+          rwMap.flyTo([13.0418, 80.2341], 16, { duration: 1.2 });
+        }
+      }, 150);
+
+      // Trigger MTC Driver Detour & Alert
+      document.getElementById('driver-broadcast-bar').classList.remove('hidden');
+
+      if (rwDetourPolyline && rwMap) rwDetourPolyline.addTo(rwMap);
+      if (rwDangerCircle && rwMap) rwDangerCircle.addTo(rwMap);
+
+      showToast('error', 'MTC Driver Broadcast Alert Emitted', 'Critical hazard at Usman Rd subway [13.0418, 80.2341]. Danger radius & bus detour plotted.');
+    }
+
+    // Demo 3: Test WaterLink Ticket & Ledger
+    function runDemoWaterLinkTicket() {
+      toggleDemoMenu();
+      switchModule('waterlink');
+
+      setTimeout(() => {
+        if (wlMap) {
+          wlMap.invalidateSize();
+          wlMap.flyTo([13.0213, 80.2231], 14, { duration: 1.2 });
+        }
+      }, 150);
+
+      bookWaterlinkTicket();
+    }
+
+    // ---------------------------------------------------------------------------
+    // 10. INITIALIZATION ON PAGE LOAD
+    // ---------------------------------------------------------------------------
+    window.addEventListener('DOMContentLoaded', () => {
+      initWaterlinkSelects();
+      renderTransitPulseTables();
+      updateMetricCounters();
+      updateRoadwatchPhotoFilename();
+    });
+  </script>
+</body>
+</html>

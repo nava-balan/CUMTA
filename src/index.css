@@ -1,0 +1,80 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Leaflet Container & Google Maps Dark Mode Tile Inversion */
+.leaflet-container {
+  background: #042F40 !important;
+  font-family: 'Inter', sans-serif;
+  z-index: 1;
+}
+
+/* Dark Map mode: apply CSS filter strictly to .leaflet-tile-pane */
+.leaflet-tile-pane.tile-filter-dark {
+  filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
+}
+
+.leaflet-tile-pane.tile-filter-none {
+  filter: none !important;
+}
+
+/* Solid Leaflet controls & popups */
+.leaflet-control-zoom {
+  border: 1px solid #1C2541 !important;
+  border-radius: 8px !important;
+  overflow: hidden;
+}
+
+.leaflet-control-zoom a {
+  background: #1C2541 !important;
+  color: #F8FAFC !important;
+  border-bottom: 1px solid #0B132B !important;
+}
+
+.leaflet-control-zoom a:hover {
+  background: #3A86FF !important;
+  color: #FFFFFF !important;
+}
+
+.leaflet-popup-content-wrapper {
+  background: #1C2541 !important;
+  color: #F8FAFC !important;
+  border: 1px solid #3A86FF !important;
+  border-radius: 8px !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2) !important;
+  padding: 0 !important;
+}
+
+.leaflet-popup-content {
+  margin: 16px !important;
+  line-height: 1.4 !important;
+}
+
+.leaflet-popup-tip {
+  background: #1C2541 !important;
+  border: 1px solid #3A86FF !important;
+}
+
+.leaflet-popup-close-button {
+  color: #F8FAFC !important;
+  padding: 8px !important;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0B132B;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1C2541;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #3A86FF;
+}
