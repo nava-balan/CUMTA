@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Layers, ChevronDown, AlertCircle, Compass, Ticket, RotateCcw } from 'lucide-react';
+import { Layers, ChevronDown, ChevronUp, AlertCircle, Compass, Ticket, RotateCcw } from 'lucide-react';
 import { useGlobal } from '../../store/globalStore';
 
 export default function DemoToolkit() {
